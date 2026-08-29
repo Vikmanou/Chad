@@ -2,6 +2,7 @@ add_library(chad_core
     core/file.cpp
     compiler/instruction.cpp
     compiler/program.cpp
+    core/text.cpp
 )
 add_library(chad::core ALIAS chad_core)
 
