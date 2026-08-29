@@ -1,0 +1,15 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+AccessModifierOffset: -4
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+IndentCaseLabels: true
+DerivePointerAlignment: false
+PointerAlignment: Left
+FixNamespaceComments: false
+SortIncludes: CaseSensitive
+IncludeBlocks: Preserve
+InsertNewlineAtEOF: false
