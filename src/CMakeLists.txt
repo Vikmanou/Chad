@@ -1,8 +1,10 @@
 add_library(chad_core
+    core/error.cpp
     core/file.cpp
-    compiler/instruction.cpp
-    compiler/program.cpp
     core/text.cpp
+    compiler/instruction.cpp
+    compiler/lexer.cpp
+    compiler/program.cpp
 )
 add_library(chad::core ALIAS chad_core)
 
