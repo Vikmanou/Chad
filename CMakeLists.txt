@@ -23,7 +23,7 @@ if(MINGW)
     target_link_options(chad_options INTERFACE -static-libstdc++ -static-libgcc)
 endif()
 
-#add_subdirectory(src)
+add_subdirectory(src)
 add_subdirectory(app)
 
 #enable_testing()
