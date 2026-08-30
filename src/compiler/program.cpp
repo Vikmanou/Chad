@@ -30,6 +30,29 @@ Instruction fromToken(const Token& token) {
     return instruction;
 }
 
+void linkBrackets(std::vector<Instruction>& instructions) {
+    std::vector<int> open;
+
+    for (int i = 0; i < instructions.size(); ++i) {
+        if (instructions[i].op == Op::LoopStart) {
+            open.push_back(i);
+        } else if (instructions[i].op == Op::LoopEnd) {
+            if (open.empty()) {
+                throw errorAt(instructions[i].line, "unmatched bracket", "`]` here never opens");
+            }
+
+            const int start = open.back();
+            open.pop_back();
+            instructions[start].arg = i + 1;
+            instructions[i].arg = start + 1;
+        }
+    }
+
+    if (!open.empty()) {
+        throw errorAt(instructions[open.back()].line, "unmatched bracket", "`[` here never closes");
+    }
+}
+
 }
 
 Program compile(const std::string& source) {
@@ -38,6 +61,8 @@ Program compile(const std::string& source) {
     for (const Token& token : lex(source)) {
         program.instructions.push_back(fromToken(token));
     }
+
+    linkBrackets(program.instructions);
 
     return program;
 }
