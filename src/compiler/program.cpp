@@ -15,7 +15,18 @@ Instruction fromToken(const Token& token) {
     Instruction instruction;
     instruction.line = token.line;
 
-    
+    if (token.kind == TokenKind::Number) {
+        instruction.op = Op::Push;
+        instruction.arg = token.value;
+        return instruction;
+    }
+
+    const std::optional<Op> op = findOp(toLowercase(token.text));
+    if (!op) {
+        throw errorAt(token.line, "unknown word `" + token.text + "`");
+    }
+
+    instruction.op = *op;
     return instruction;
 }
 
