@@ -14,6 +14,7 @@ namespace chad {
 namespace {
 
 const std::string COMMENT_WORD = "ngl";
+const std::string UTF8_BOM = "\xEF\xBB\xBF"; // some editors (notepad) put these bytes to mark UTF-8
 
 bool startsAsNumber(const std::string& lexeme) {
     if (isDigit(lexeme[0]))
@@ -75,7 +76,7 @@ Token classify(const std::string& lexeme, int line) {
 TokenList lex(const std::string& source) {
     TokenList tokens;
 
-    int idx = 0;
+    int idx = (source.compare(0, UTF8_BOM.size(), UTF8_BOM) == 0) ? UTF8_BOM.size() : 0;
 
     int line = 1;
 
