@@ -11,6 +11,7 @@
 #include "chad/core/error.h"
 #include "chad/compiler/program.h"
 #include "cli.h"
+#include "chad/runtime/interpreter.h"
 
 namespace {
 // take a wild guess who is responsible for this... Windows.
@@ -42,19 +43,16 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    std::cout << *source << std::endl;
-
     useBinaryStreams();
 
     try {
         const chad::Program program = chad::compile(*source);
+        chad::run(program);
     } catch (const chad::Error& error) {
         std::fflush(stdout);
         std::cerr << error.what() << "\n";
         return 1;
     }
-
-    std::cout << " chad!" << std::endl;
 
     return 0;
 }
