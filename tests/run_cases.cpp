@@ -35,7 +35,8 @@ std::string check(const fs::path& test) {
 #if defined(_WIN32)
     const int exitCode = std::system(("\"" + command + "\"").c_str());
 #else
-    const int exitCode = WEXITSTATUS(std::system(command.c_str()));
+    const int status = std::system(command.c_str());
+    const int exitCode = WEXITSTATUS(status);
 #endif
 
     const bool wantsError = fs::exists(sibling(test, ".stderr"));
