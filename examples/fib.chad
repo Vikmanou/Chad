@@ -1,0 +1,14 @@
+ngl fib(10) = 55
+0 10
+[
+    rep 2 mogs
+    [
+        ghost rep -1 * 2 + pivot
+        1 - rep 2 mogs
+    ]
+    ghost 0 mogs
+    pivot rep 0 mogs
+    [ ghost + pivot rep 0 mogs ]
+    ghost -1 *
+]
+ghost sayn
