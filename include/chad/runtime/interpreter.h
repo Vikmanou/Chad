@@ -1,6 +1,6 @@
 #pragma once
 
-#include "chad/compiler/program.h"
+#include "chad/lang/program.h"
 
 namespace chad {
 

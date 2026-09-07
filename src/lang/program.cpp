@@ -1,11 +1,11 @@
-#include "chad/compiler/program.h"
+#include "chad/lang/program.h"
 
 #include <optional>
 
 #include "chad/core/error.h"
 #include "chad/core/text.h"
-#include "chad/compiler/instruction.h"
-#include "chad/compiler/lexer.h"
+#include "chad/lang/instruction.h"
+#include "chad/lang/lexer.h"
 
 namespace chad {
 
@@ -38,7 +38,8 @@ void linkBrackets(std::vector<Instruction>& instructions) {
             open.push_back(i);
         } else if (instructions[i].op == Op::LoopEnd) {
             if (open.empty()) {
-                throw errorAt(instructions[i].line, "unmatched bracket", "`]` here never opens");
+                throw errorAt(instructions[i].line, "unmatched bracket",
+                              "`]` here never opens");
             }
 
             const int start = open.back();
@@ -49,7 +50,8 @@ void linkBrackets(std::vector<Instruction>& instructions) {
     }
 
     if (!open.empty()) {
-        throw errorAt(instructions[open.back()].line, "unmatched bracket", "`[` here never closes");
+        throw errorAt(instructions[open.back()].line, "unmatched bracket",
+                      "`[` here never closes");
     }
 }
 

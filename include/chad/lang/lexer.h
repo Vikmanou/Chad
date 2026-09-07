@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "chad/compiler/token.h"
+#include "chad/lang/token.h"
 
 namespace chad {
 

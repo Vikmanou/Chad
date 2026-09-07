@@ -3,15 +3,16 @@
 #include <string>
 
 #ifdef _WIN32
-    #include <fcntl.h>
-    #include <io.h>
+#include <fcntl.h>
+#include <io.h>
 #endif
 
-#include "chad/core/file.h"
 #include "chad/core/error.h"
-#include "chad/compiler/program.h"
-#include "cli.h"
+#include "chad/core/file.h"
+#include "chad/lang/program.h"
 #include "chad/runtime/interpreter.h"
+#include "cli.h"
+
 
 namespace {
 // take a wild guess who is responsible for this... Windows.
