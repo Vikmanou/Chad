@@ -3,6 +3,7 @@ add_library(chad_core
     core/file.cpp
     core/text.cpp
     lang/lexer.cpp
+    lang/parser.cpp
     lang/program.cpp
     runtime/io.cpp
     runtime/utf8.cpp
