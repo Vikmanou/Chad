@@ -11,6 +11,29 @@ namespace {
 
 using namespace ast;
 
+bool isKeyword(const std::string& word) {
+    return word == "main" || word == "vs" || word == "if" || word == "else" || word == "and" || word == "or" || word == "not";
+}
+
+Expr unary(Operator op, Expr operand, int line) {
+    Expr expr;
+    expr.kind = ExprKind::Unary;
+    expr.op = op;
+    expr.line = line;
+    expr.operands.push_back(std::move(operand));
+    return expr;
+}
+
+Expr binary(Operator op, Expr left, Expr right, int line) {
+    Expr expr;
+    expr.kind = ExprKind::Binary;
+    expr.op = op;
+    expr.line = line;
+    expr.operands.push_back(std::move(left));
+    expr.operands.push_back(std::move(right));
+    return expr;
+}
+
 class Parser {
 public:
     explicit Parser(const TokenList& tokens) : tokens(tokens) {}
@@ -60,6 +83,64 @@ private:
         while (peek().kind == TokenKind::Newline) {
             ++pos;
         }
+    }
+
+    std::string takeName(const std::string& wanted) {
+        if (peek().kind != TokenKind::Name || isKeyword(peek().text)) fail(wanted);
+        return tokens[pos++].text;
+    }
+
+    // lowest to highest: + -, * / %, unary -
+    Expr parseExpr() {
+        return parseSum();
+    }
+
+    Expr parseSum() {
+        Expr left = parseProduct();
+        while (isSymbol("+") || isSymbol("-")) {
+            const Operator op = isSymbol("+") ? Operator::Add : Operator::Sub;
+            const int line = tokens[pos++].line;
+            left = binary(op, std::move(left), parseProduct(), line);
+        }
+        return left;
+    }
+
+    Expr parseProduct() {
+        Expr left = parseUnary();
+        while (isSymbol("*") || isSymbol("/") || isSymbol("%")) {
+            const Operator op = isSymbol("*") ? Operator::Mul : isSymbol("/") ? Operator::Div
+                                                                              : Operator::Mod;
+            const int line = tokens[pos++].line;
+            left = binary(op, std::move(left), parseUnary(), line);
+        }
+        return left;
+    }
+
+    Expr parseUnary() {
+        if (isSymbol("-")) {
+            const int line = tokens[pos++].line;
+            return unary(Operator::Negate, parseUnary(), line);
+        }
+        return parsePrimary();
+    }
+
+    Expr parsePrimary() {
+        Expr expr;
+        expr.line = peek().line;
+
+        if (peek().kind == TokenKind::Number || peek().kind == TokenKind::Char) {
+            expr.kind = ExprKind::Number;
+            expr.number = tokens[pos++].value;
+            return expr;
+        }
+        if (acceptSymbol("(")) {
+            expr = parseExpr();
+            expectSymbol(")");
+            return expr;
+        }
+        expr.kind = ExprKind::Name;
+        expr.name = takeName("a Chad, a wire or a value");
+        return expr;
     }
 };
 
