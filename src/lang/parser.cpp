@@ -90,8 +90,30 @@ private:
         return tokens[pos++].text;
     }
 
-    // lowest to highest: comparisons, + -, * / %, unary -
+    // lowest to highest: or, and, not, comparisons, + -, * / %, unary -
     Expr parseExpr() {
+        Expr left = parseAnd();
+        while (isWord("or")) {
+            const int line = tokens[pos++].line;
+            left = binary(Operator::Or, std::move(left), parseAnd(), line);
+        }
+        return left;
+    }
+
+    Expr parseAnd() {
+        Expr left = parseNot();
+        while (isWord("and")) {
+            const int line = tokens[pos++].line;
+            left = binary(Operator::And, std::move(left), parseNot(), line);
+        }
+        return left;
+    }
+
+    Expr parseNot() {
+        if (isWord("not")) {
+            const int line = tokens[pos++].line;
+            return unary(Operator::Not, parseNot(), line);
+        }
         return parseComparison();
     }
 
