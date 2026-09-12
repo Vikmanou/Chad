@@ -171,7 +171,12 @@ private:
             rule.cases.push_back(std::move(branch));
             skipNewlines();
 
-            if (isElse) break;
+            if (isElse) {
+                if (isWord("if") || isWord("else")) {
+                    throw errorAt(peek().line, "case after `else`", "`else` has to be the last case");
+                }
+                break;
+            }
         }
 
         source.rules.push_back(std::move(rule));
