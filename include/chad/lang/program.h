@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "chad/lang/ast.h"
@@ -47,8 +48,50 @@ struct Code {
     int line = 0;
 };
 
+// one end of a wire in a template
+struct End {
+    bool outside = false;
+    int index = 0; // which outside port or which new Chad
+    int slot = 0; // port of the new Chad: 0 is the face, 1 the arms
+};
+
+struct NewChad {
+    Breed breed = 0;
+    std::vector<Code> values;
+    int line = 0;
+};
+
+// face off result
+struct Template {
+    std::vector<NewChad> chads;
+    std::vector<std::pair<End, End>> links;
+};
+
+struct RuleCase {
+    bool hasCondition = false;
+    Code condition;
+    Template result;
+    int line = 0;
+};
+
+struct Rule {
+    Breed left = 0;
+    Breed right = 0;
+    std::vector<RuleCase> cases;
+    int line = 0;
+};
+
 struct Program {
     std::vector<BreedInfo> breeds;
+    std::vector<Rule> rules;
+    std::vector<int> ruleTable;
+    Template main;
+    bool usesWorld = false;
+    int mainLine = 0;
+
+    int findRule(Breed a, Breed b) const {
+        return ruleTable[static_cast<std::size_t>(a) * breeds.size() + static_cast<std::size_t>(b)];
+    }
 };
 
 }
