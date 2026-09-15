@@ -15,19 +15,6 @@ bool isKeyword(const std::string& word) {
     return word == "main" || word == "vs" || word == "if" || word == "else" || word == "and" || word == "or" || word == "not";
 }
 
-std::string describe(const Token& token) {
-    switch (token.kind) {
-        case TokenKind::End:
-            return "the end of the file";
-        case TokenKind::Newline:
-            return "the end of the line";
-        case TokenKind::String:
-            return "a string";
-        default:
-            return "`" + token.text + "`";
-    }
-}
-
 Expr unary(Operator op, Expr operand, int line) {
     Expr expr;
     expr.kind = ExprKind::Unary;

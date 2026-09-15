@@ -13,14 +13,6 @@ namespace chad {
 
 namespace {
 
-std::string plural(std::size_t count, const char* word) {
-    return (count == 0 ? std::string("no") : std::to_string(count)) + " " + word + (count == 1 ? "" : "s");
-}
-
-std::string shape(std::size_t values, std::size_t arms) {
-    return plural(values, "value") + " and " + plural(arms, "arm");
-}
-
 class Compiler {
 public:
     Compiler() {
@@ -75,7 +67,7 @@ public:
 
         const BreedInfo& info = program.breeds[found->second];
         if (info.valueCount != static_cast<int>(valueCount) || info.armCount != static_cast<int>(armCount)) {
-            const std::string where = info.line == 0 ? "as a built-in" : "on line " + std::to_string(info.line);
+            const std::string where = info.line == 0 ? "as a built-in" : "on " + lineName(info.line);
             throw errorAt(line, "wrong shape for `" + name + "`",
                           "it has " + shape(valueCount, armCount) + " here, but " +
                               shape(info.valueCount, info.armCount) + " " + where);
