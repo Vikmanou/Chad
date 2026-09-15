@@ -1,0 +1,6 @@
+Foo(a) vs Nil => a ~ Ghost
+
+main
+  Nil ~ Foo(a, b)
+  a ~ Ghost
+  b ~ Ghost
