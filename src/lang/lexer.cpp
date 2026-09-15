@@ -194,7 +194,7 @@ private:
         }
 
         const unsigned char firstByte = static_cast<unsigned char>(source[index]);
-        const int byteCount = utf8::charByteCount(firstByte);
+        const std::size_t byteCount = utf8::charByteCount(firstByte);
         if (byteCount == 0 || index + byteCount > source.size()) {
             throw errorAt(line, "invalid UTF-8", std::string("in a ") + literal);
         } else if (byteCount == 1) {
@@ -203,7 +203,7 @@ private:
         }
 
         std::int64_t codePoint = utf8::firstByteBits(firstByte, byteCount);
-        for (int i = 1; i < byteCount; ++i) {
+        for (std::size_t i = 1; i < byteCount; ++i) {
             const unsigned char nextByte = static_cast<unsigned char>(source[index + i]);
             if (!utf8::isContinuationByte(nextByte)) {
                 throw errorAt(line, "invalid UTF-8", std::string("in a ") + literal);
