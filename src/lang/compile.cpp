@@ -46,10 +46,11 @@ public:
     }
 
     void addMain(const ast::Source& source) {
-        if (!source.hasMain) {
-            throw errorAt(1, "no `main`", "a program starts from its `main` block");
-        }
-        addConnections(source.main);
+        if (!source.hasMain) throw errorAt(1, "no `main`", "a program starts from its `main` block");
+
+        Scope scope;
+        scope.inMain = true;
+        addConnections(source.main, scope);
     }
 
     Program finish() {
@@ -163,23 +164,33 @@ private:
         bind(rule.right, scope);
 
         for (const ast::Case& branch : rule.cases) {
-            addConnections(branch.connections);
+            if (branch.hasCondition) {
+                compileExpr(branch.condition, scope);
+            }
+            addConnections(branch.connections, scope);
         }
     }
 
-    void addTerm(const ast::Term& term) {
+    void addTerm(const ast::Term& term, const Scope& scope) {
+        if (term.kind == ast::TermKind::Value) {
+            compileExpr(term.value, scope);
+            return;
+        }
         if (term.kind != ast::TermKind::Chad) return;
 
         breedFor(term.name, term.values.size(), term.arms.size(), term.line);
+        for (const ast::Expr& value : term.values) {
+            compileExpr(value, scope);
+        }
         for (const ast::Term& arm : term.arms) {
-            addTerm(arm);
+            addTerm(arm, scope);
         }
     }
 
-    void addConnections(const std::vector<ast::Connection>& connections) {
+    void addConnections(const std::vector<ast::Connection>& connections, const Scope& scope) {
         for (const ast::Connection& connection : connections) {
-            addTerm(connection.left);
-            addTerm(connection.right);
+            addTerm(connection.left, scope);
+            addTerm(connection.right, scope);
         }
     }
 };
