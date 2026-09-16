@@ -15,11 +15,11 @@ namespace chad {
 namespace {
 
 struct Scope {
-    std::map<std::string, int> values;
-    std::map<std::string, int> outside;
+    std::map<std::string, std::size_t> values;
+    std::map<std::string, std::size_t> outside;
 
-    int valueCount = 0;
-    int outsideCount = 0;
+    std::size_t valueCount = 0;
+    std::size_t outsideCount = 0;
 
     bool inMain = false;
 };
@@ -89,12 +89,14 @@ public:
         return found->second;
     }
 
-    Code compilerExpr(const ast::Expr& expr, const Scope& scope) const {
+    Code compileExpr(const ast::Expr& expr, const Scope& scope) const {
         Code code;
         code.line = at(expr.line);
 
         switch (expr.kind) {
             case ast::ExprKind::Number:
+                code.kind = Code::Kind::Constant;
+                code.constant = expr.number;
                 return code;
             case ast::ExprKind::Name: {
                 const auto value = scope.values.find(expr.name);
@@ -102,7 +104,7 @@ public:
                     code.kind = Code::Kind::Slot;
                     code.slot = value->second;
                     return code;
-                } else if (expr.name == '_') {
+                } else if (expr.name == "_") {
                     throw errorAt(code.line, "`_` only works in rule heads");
                 } else if (scope.outside.count(expr.name) != 0 || expr.name == "world") {
                     throw errorAt(code.line, "`" + expr.name + "` is a wire, not a value", "values are the names in `[ ]` or a number in the rule head");
@@ -114,7 +116,7 @@ public:
                 code.kind = expr.kind == ast::ExprKind::Unary ? Code::Kind::Unary : Code::Kind::Binary;
                 code.op = expr.op;
                 for (const ast::Expr& operand : expr.operands) {
-                    code.operands.push_back(compilerExpr(operand, scope));
+                    code.operands.push_back(compileExpr(operand, scope));
                 }
                 return code;
         }
