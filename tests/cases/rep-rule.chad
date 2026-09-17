@@ -1,0 +1,4 @@
+Rep(a, b) vs Nil => a ~ b
+
+main
+  Nil ~ Ghost
