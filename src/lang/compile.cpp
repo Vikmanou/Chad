@@ -208,6 +208,7 @@ private:
         std::vector<int> uses;
         std::vector<End> ends;
         bool fromHead = false;
+        std::size_t joinedTo = 0;
     };
 
     struct Placed {
@@ -227,10 +228,19 @@ private:
         if (isNew) {
             Wire wire;
             wire.name = name;
+            wire.joinedTo = wires.size();
             wires.push_back(std::move(wire));
         }
 
         return found->second;
+    }
+
+    std::size_t joinedRoot(std::size_t wire) const {
+        while (wires[wire].joinedTo != wire) {
+            wire = wires[wire].joinedTo;
+        }
+
+        return wire;
     }
 
     static End face(std::size_t chad) {
@@ -363,6 +373,10 @@ private:
         if (left.isWire && right.isWire) {
             wires[left.wire].uses.push_back(connection.line);
             wires[right.wire].uses.push_back(connection.line);
+
+            const std::size_t a = joinedRoot(left.wire);
+            const std::size_t b = joinedRoot(right.wire);
+            wires[a].joinedTo = b;
         } else if (left.isWire) {
             attach(left.wire, right.end, connection.line);
         } else if (right.isWire) {
