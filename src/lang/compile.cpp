@@ -1,6 +1,7 @@
 #include "chad/lang/compile.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <utility>
@@ -46,13 +47,7 @@ public:
         }
     }
 
-    void addMain(const ast::Source& source) {
-        if (!source.hasMain) throw errorAt(1, "no `main`", "a program starts from its `main` block");
-
-        Scope scope;
-        scope.inMain = true;
-        addConnections(source.main, scope);
-    }
+    void addMain(const ast::Source& source);
 
     Program finish() {
         const std::size_t count = program.breeds.size();
@@ -185,61 +180,238 @@ private:
         }
     }
 
-    void addRule(const ast::Rule& rule) {
-        const Breed left = patternBreed(rule.left);
-        const Breed right = patternBreed(rule.right);
-        checkPair(rule, left, right);
+    void addRule(const ast::Rule& rule);
+};
 
-        const auto [found, isNew] = ruleLines.emplace(std::minmax(left, right), at(rule.line));
-        if (!isNew) throw errorAt(at(rule.line), "second rule for `" + breedName(left) + " vs " + breedName(right) + "`", "the first one is on " + lineName(found->second));
-
-        Scope scope;
-        bind(rule.left, scope);
-        bind(rule.right, scope);
-
-        Rule compiled;
-        compiled.left = left;
-        compiled.right = right;
-        compiled.line = at(rule.line);
-
-        for (const ast::Case& branch : rule.cases) {
-            RuleCase compiledCase;
-            compiledCase.line = at(branch.line);
-            if (branch.hasCondition) {
-                compiledCase.hasCondition = true;
-                compiledCase.condition = compileExpr(branch.condition, scope);
-            }
-            addConnections(branch.connections, scope);
-            compiled.cases.push_back(std::move(compiledCase));
-        }
-
-        program.rules.push_back(std::move(compiled));
-    }
-
-    void addTerm(const ast::Term& term, const Scope& scope) {
-        if (term.kind == ast::TermKind::Value) {
-            compileExpr(term.value, scope);
-            return;
-        }
-        if (term.kind != ast::TermKind::Chad) return;
-
-        breedFor(term.name, term.values.size(), term.arms.size(), term.line);
-        for (const ast::Expr& value : term.values) {
-            compileExpr(value, scope);
-        }
-        for (const ast::Term& arm : term.arms) {
-            addTerm(arm, scope);
+class TemplateBuilder {
+public:
+    TemplateBuilder(Compiler& compiler, const Scope& scope, int headLine) : compiler(compiler), scope(scope) {
+        for (const auto& [name, port] : scope.outside) {
+            Wire& wire = wires[wireFor(name)];
+            wire.fromHead = true;
+            wire.uses.push_back(headLine);
+            wire.ends.push_back(End{true, port, 0});
         }
     }
 
-    void addConnections(const std::vector<ast::Connection>& connections, const Scope& scope) {
+    Template build(const std::vector<ast::Connection>& connections) {
         for (const ast::Connection& connection : connections) {
-            addTerm(connection.left, scope);
-            addTerm(connection.right, scope);
+            connect(connection);
+        }
+
+        return std::move(result);
+    }
+
+private:
+    struct Wire {
+        std::string name;
+        std::vector<int> uses;
+        std::vector<End> ends;
+        bool fromHead = false;
+    };
+
+    struct Placed {
+        bool isWire = false;
+        std::size_t wire = 0;
+        End end;
+    };
+
+    Compiler& compiler;
+    const Scope& scope;
+    Template result;
+    std::vector<Wire> wires;
+    std::map<std::string, std::size_t> wireIds;
+
+    std::size_t wireFor(const std::string& name) {
+        const auto [found, isNew] = wireIds.emplace(name, wires.size());
+        if (isNew) {
+            Wire wire;
+            wire.name = name;
+            wires.push_back(std::move(wire));
+        }
+
+        return found->second;
+    }
+
+    static End face(std::size_t chad) {
+        return End{false, chad, 0};
+    }
+
+    static Placed wirePlaced(std::size_t wire) {
+        Placed placed;
+        placed.isWire = true;
+        placed.wire = wire;
+        return placed;
+    }
+
+    static Placed endPlaced(End end) {
+        Placed placed;
+        placed.end = end;
+        return placed;
+    }
+
+    std::size_t newChad(Breed breed, std::vector<Code> values, int line) {
+        NewChad chad;
+        chad.breed = breed;
+        chad.values = std::move(values);
+        chad.line = compiler.at(line);
+        result.chads.push_back(std::move(chad));
+
+        return result.chads.size() - 1;
+    }
+
+    std::size_t numberChad(Code value, int line) {
+        std::vector<Code> values;
+        values.push_back(std::move(value));
+
+        return newChad(breed::Number, std::move(values), line);
+    }
+
+    Placed place(const ast::Term& term) {
+        switch (term.kind) {
+            case ast::TermKind::Name:
+                return placeName(term);
+            case ast::TermKind::Value:
+                return endPlaced(face(numberChad(compiler.compileExpr(term.value, scope), term.line)));
+            case ast::TermKind::Chad:
+                return endPlaced(face(placeChad(term)));
+            case ast::TermKind::String:
+                return endPlaced(placeString(term));
+        }
+
+        return Placed{};
+    }
+
+    Placed placeName(const ast::Term& term) {
+        const std::string& name = term.name;
+        if (name == "_") throw errorAt(compiler.at(term.line), "`_` only works in rule heads");
+
+        const auto value = scope.values.find(name);
+        if (value != scope.values.end()) {
+            Code code;
+            code.kind = Code::Kind::Slot;
+            code.slot = value->second;
+            code.line = compiler.at(term.line);
+            return endPlaced(face(numberChad(std::move(code), term.line)));
+        }
+
+        return wirePlaced(wireFor(name));
+    }
+
+    std::size_t placeChad(const ast::Term& term) {
+        const Breed breed = compiler.breedFor(term.name, term.values.size(), term.arms.size(), term.line);
+
+        std::vector<Code> values;
+        for (const ast::Expr& value : term.values) {
+            values.push_back(compiler.compileExpr(value, scope));
+        }
+
+        const std::size_t chad = newChad(breed, std::move(values), term.line);
+        for (std::size_t i = 0; i < term.arms.size(); i++) {
+            plug(End{false, chad, i + 1}, place(term.arms[i]), term.arms[i].line);
+        }
+
+        return chad;
+    }
+
+    End placeString(const ast::Term& term) {
+        std::size_t first = 0;
+        std::size_t previous = 0;
+        bool empty = true;
+
+        for (const std::int64_t c : term.text) {
+            Code code;
+            code.constant = c;
+            code.line = compiler.at(term.line);
+            std::vector<Code> values;
+            values.push_back(std::move(code));
+
+            const std::size_t cons = newChad(breed::Cons, std::move(values), term.line);
+            if (empty) {
+                first = cons;
+            } else {
+                result.links.push_back({End{false, previous, 1}, face(cons)});
+            }
+            previous = cons;
+            empty = false;
+        }
+
+        const std::size_t nil = newChad(breed::Nil, {}, term.line);
+        if (empty) return face(nil);
+
+        result.links.push_back({End{false, previous, 1}, face(nil)});
+        return face(first);
+    }
+
+    void attach(std::size_t wire, End end, int line) {
+        wires[wire].uses.push_back(line);
+        wires[wire].ends.push_back(end);
+    }
+
+    void plug(End position, const Placed& placed, int line) {
+        if (placed.isWire) {
+            attach(placed.wire, position, line);
+        } else {
+            result.links.push_back({position, placed.end});
+        }
+    }
+
+    void connect(const ast::Connection& connection) {
+        const Placed left = place(connection.left);
+        const Placed right = place(connection.right);
+
+        if (left.isWire && right.isWire) {
+            wires[left.wire].uses.push_back(connection.line);
+            wires[right.wire].uses.push_back(connection.line);
+        } else if (left.isWire) {
+            attach(left.wire, right.end, connection.line);
+        } else if (right.isWire) {
+            attach(right.wire, left.end, connection.line);
+        } else {
+            result.links.push_back({left.end, right.end});
         }
     }
 };
 
+void Compiler::addRule(const ast::Rule& rule) {
+    const Breed left = patternBreed(rule.left);
+    const Breed right = patternBreed(rule.right);
+    checkPair(rule, left, right);
+
+    const auto [found, isNew] = ruleLines.emplace(std::minmax(left, right), at(rule.line));
+    if (!isNew) throw errorAt(at(rule.line), "second rule for `" + breedName(left) + " vs " + breedName(right) + "`", "the first one is on " + lineName(found->second));
+
+    Scope scope;
+    bind(rule.left, scope);
+    bind(rule.right, scope);
+
+    Rule compiled;
+    compiled.left = left;
+    compiled.right = right;
+    compiled.line = at(rule.line);
+
+    for (const ast::Case& branch : rule.cases) {
+        RuleCase compiledCase;
+        compiledCase.line = at(branch.line);
+        if (branch.hasCondition) {
+            compiledCase.hasCondition = true;
+            compiledCase.condition = compileExpr(branch.condition, scope);
+        }
+        compiledCase.result = TemplateBuilder(*this, scope, rule.line).build(branch.connections);
+        compiled.cases.push_back(std::move(compiledCase));
+    }
+
+    program.rules.push_back(std::move(compiled));
+}
+
+void Compiler::addMain(const ast::Source& source) {
+    if (!source.hasMain) throw errorAt(1, "no `main`", "a program starts from its `main` block");
+
+    Scope scope;
+    scope.inMain = true;
+    program.main = TemplateBuilder(*this, scope, source.mainLine).build(source.main);
+    program.mainLine = source.mainLine;
+}
 }
 
 Program compile(const std::string& source) {
