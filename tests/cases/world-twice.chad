@@ -1,0 +1,5 @@
+Foo(r) vs n => r ~ n
+
+main
+  1 ~ Foo(world)
+  2 ~ Foo(world)
