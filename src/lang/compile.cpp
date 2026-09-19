@@ -198,6 +198,7 @@ public:
         for (const ast::Connection& connection : connections) {
             connect(connection);
         }
+        finishWires();
 
         return std::move(result);
     }
@@ -383,6 +384,30 @@ private:
             attach(right.wire, left.end, connection.line);
         } else {
             result.links.push_back({left.end, right.end});
+        }
+    }
+
+    void finishWires() {
+        for (const Wire& wire : wires) {
+            const std::size_t count = wire.uses.size();
+            if (count == 2) continue;
+
+            if (count == 1 && wire.fromHead) throw errorAt(compiler.at(wire.uses[0]), "loose wire `" + wire.name + "`", "it comes from the rule head but is never connected");
+            if (count == 1) throw errorAt(compiler.at(wire.uses[0]), "loose wire `" + wire.name + "`", "it has one end; every wire needs two");
+
+            throw errorAt(compiler.at(wire.uses[2]), "wire `" + wire.name + "` used " + std::to_string(count) + " times", "every wire has exactly two ends");
+        }
+
+        std::map<std::size_t, std::vector<End>> joined;
+        for (std::size_t i = 0; i < wires.size(); i++) {
+            std::vector<End>& ends = joined[joinedRoot(i)];
+            ends.insert(ends.end(), wires[i].ends.begin(), wires[i].ends.end());
+        }
+
+        for (const auto& [root, ends] : joined) {
+            if (ends.size() == 2) {
+                result.links.push_back({ends[0], ends[1]});
+            }
         }
     }
 };
