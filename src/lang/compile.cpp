@@ -407,6 +407,8 @@ private:
         for (const auto& [root, ends] : joined) {
             if (ends.size() == 2) {
                 result.links.push_back({ends[0], ends[1]});
+            } else if (ends.empty()) {
+                throw errorAt(compiler.at(wires[root].uses[0]), "wire loop `" + wires[root].name + "`", "it only connects to itself");
             }
         }
     }
