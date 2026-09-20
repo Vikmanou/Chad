@@ -26,4 +26,11 @@ void Net::remove(std::size_t node) {
     freeNodes.push_back(node);
 }
 
+void Net::link(Port a, Port b) {
+    nodes[a.node].ports[a.slot] = b;
+    nodes[b.node].ports[b.slot] = a;
+
+    if (a.slot == 0 && b.slot == 0) faceOffs.emplace_back(a.node, b.node);
+}
+
 }
