@@ -33,4 +33,23 @@ void Net::link(Port a, Port b) {
     if (a.slot == 0 && b.slot == 0) faceOffs.emplace_back(a.node, b.node);
 }
 
+bool Net::facing(std::size_t a, std::size_t b) const {
+    if (nodes[a].ports.empty() || nodes[b].ports.empty()) return false;
+
+    const Port faceA = nodes[a].ports[0];
+    const Port faceB = nodes[b].ports[0];
+    return faceA.node == b && faceA.slot == 0 && faceB.node == a && faceB.slot == 0;
+}
+
+bool Net::nextFaceOff(std::pair<std::size_t, std::size_t>& faceOff) {
+    while (!faceOffs.empty()) {
+        faceOff = faceOffs.back();
+        faceOffs.pop_back();
+
+        if (facing(faceOff.first, faceOff.second)) return true;
+    }
+
+    return false;
+}
+
 }
