@@ -1,0 +1,2 @@
+main
+  world ~ Say['H'](Say['i'](Ghost))
