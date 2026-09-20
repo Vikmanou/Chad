@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -44,6 +45,8 @@ private:
     std::vector<Port> outsidePorts;
     std::vector<Inside> insides;
     std::vector<std::size_t> made;
+    std::vector<std::size_t> dying;
+    std::vector<bool> visited;
 
     std::string describe(std::size_t node) const {
         const Node& chad = net[node];
@@ -70,7 +73,7 @@ private:
     }
 
     void start() {
-        outsidePorts.clear();
+        collectOutside({});
         if (program.usesWorld) {
             const std::size_t world = net.add(breed::World, 0, program.mainLine);
             outsidePorts.push_back(Port{world, 0});
@@ -78,9 +81,62 @@ private:
         insides.assign(outsidePorts.size(), Inside{});
 
         build(program.main);
+        rewire();
+    }
+
+    void collectOutside(const std::vector<std::size_t>& nodes) {
+        dying = nodes;
+        outsidePorts.clear();
+        for (const std::size_t node : dying) {
+            for (std::size_t slot = 1; slot < net[node].ports.size(); slot++) {
+                outsidePorts.push_back(net[node].ports[slot]);
+            }
+        }
+        insides.assign(outsidePorts.size(), Inside{});
+    }
+
+    bool dyingArm(Port port, std::size_t& arm) const {
+        std::size_t offset = 0;
+        for (const std::size_t node : dying) {
+            if (port.node == node && port.slot > 0) {
+                arm = offset + port.slot - 1;
+                return true;
+            }
+            offset += net[node].ports.size() - 1;
+        }
+
+        return false;
+    }
+
+    void rewire() {
+        visited.assign(outsidePorts.size(), false);
 
         for (std::size_t i = 0; i < outsidePorts.size(); i++) {
-            net.link(outsidePorts[i], insides[i].port);
+            if (visited[i]) continue;
+            visited[i] = true;
+
+            const std::optional<Port> from = follow(i, true);
+            const std::optional<Port> to = follow(i, false);
+            if (from && to) net.link(*from, *to);
+        }
+    }
+
+    std::optional<Port> follow(std::size_t index, bool outward) {
+        while (true) {
+            std::size_t next = 0;
+            if (outward) {
+                const Port port = outsidePorts[index];
+                if (!dyingArm(port, next)) return port;
+            } else {
+                const Inside& inside = insides[index];
+                if (!inside.outside) return inside.port;
+                next = inside.index;
+            }
+
+            if (visited[next]) return std::nullopt;
+            visited[next] = true;
+            index = next;
+            outward = !outward;
         }
     }
 
@@ -120,21 +176,36 @@ private:
         if (second == breed::Ghost) return erase(b, a);
         if (first == breed::World) return meetWorld(b, a);
         if (second == breed::World) return meetWorld(a, b);
+        if (first == breed::Chad && second == breed::Chad) return annihilate(a, b);
 
         throw errorAt(net[a].line, "no rule for " + describe(a) + " vs " + describe(b));
     }
 
-    void erase(std::size_t ghost, std::size_t victim) {
-        const int line = net[ghost].line;
-        const std::vector<Port> ports = net[victim].ports;
+    void annihilate(std::size_t a, std::size_t b) {
+        collectOutside({a, b});
 
+        const std::size_t arms = net[a].ports.size() - 1;
+        for (std::size_t i = 0; i < arms; i++) {
+            insides[i] = Inside{true, arms + i, Port{}};
+            insides[arms + i] = Inside{true, i, Port{}};
+        }
+
+        rewire();
+        net.remove(a);
+        net.remove(b);
+    }
+
+    void erase(std::size_t ghost, std::size_t victim) {
+        collectOutside({victim});
+
+        const int line = net[ghost].line;
+        for (Inside& inside : insides) {
+            inside.port = Port{net.add(breed::Ghost, 0, line), 0};
+        }
+
+        rewire();
         net.remove(ghost);
         net.remove(victim);
-
-        for (std::size_t slot = 1; slot < ports.size(); slot++) {
-            const std::size_t newGhost = net.add(breed::Ghost, 0, line);
-            net.link(Port{newGhost, 0}, ports[slot]);
-        }
     }
 
     void meetWorld(std::size_t chad, std::size_t world) {
