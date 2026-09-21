@@ -9,6 +9,7 @@
 
 #include "chad/core/error.h"
 #include "chad/lang/program.h"
+#include "chad/net/expr.h"
 #include "chad/net/net.h"
 #include "chad/runtime/io.h"
 #include "chad/runtime/utf8.h"
@@ -47,6 +48,7 @@ private:
     std::vector<std::size_t> made;
     std::vector<std::size_t> dying;
     std::vector<bool> visited;
+    std::vector<std::int64_t> bound;
 
     std::string describe(std::size_t node) const {
         const Node& chad = net[node];
@@ -65,15 +67,10 @@ private:
         return text + "`";
     }
 
-    std::int64_t evaluate(const Code& code) const {
-        if (code.kind == Code::Kind::Constant) return code.constant;
-        if (code.kind == Code::Kind::Unary && code.op == Operator::Negate) return -evaluate(code.operands[0]);
-
-        throw errorAt(code.line, "can't work out this value yet");
-    }
-
     void start() {
         collectOutside({});
+        bound.clear();
+
         if (program.usesWorld) {
             const std::size_t world = net.add(breed::World, 0, program.mainLine);
             outsidePorts.push_back(Port{world, 0});
@@ -86,12 +83,15 @@ private:
 
     void collectOutside(const std::vector<std::size_t>& nodes) {
         dying = nodes;
+
         outsidePorts.clear();
+
         for (const std::size_t node : dying) {
             for (std::size_t slot = 1; slot < net[node].ports.size(); slot++) {
                 outsidePorts.push_back(net[node].ports[slot]);
             }
         }
+
         insides.assign(outsidePorts.size(), Inside{});
     }
 
@@ -102,6 +102,7 @@ private:
                 arm = offset + port.slot - 1;
                 return true;
             }
+
             offset += net[node].ports.size() - 1;
         }
 
@@ -146,11 +147,12 @@ private:
 
     void build(const Template& result) {
         made.clear();
+
         for (const NewChad& chad : result.chads) {
             const std::size_t node = net.add(chad.breed, program.breeds[chad.breed].armCount, chad.line);
             made.push_back(node);
             for (const Code& code : chad.values) {
-                net[node].values.push_back(evaluate(code));
+                net[node].values.push_back(evaluate(code, bound));
             }
         }
 
