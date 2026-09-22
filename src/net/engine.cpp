@@ -180,7 +180,33 @@ private:
         if (second == breed::World) return meetWorld(a, b);
         if (first == breed::Chad && second == breed::Chad) return annihilate(a, b);
 
-        throw errorAt(net[a].line, "no rule for " + describe(a) + " vs " + describe(b));
+        const int index = program.findRule(first, second);
+        if (index < 0) throw errorAt(net[a].line, "no rule for " + describe(a) + " vs " + describe(b));
+
+        apply(program.rules[static_cast<std::size_t>(index)], a, b);
+    }
+
+    void apply(const Rule& rule, std::size_t a, std::size_t b) {
+        if (net[a].breed != rule.left) std::swap(a, b);
+
+        bound = net[a].values;
+        bound.insert(bound.end(), net[b].values.begin(), net[b].values.end());
+
+        collectOutside({a, b});
+
+        const RuleCase* chosen = nullptr;
+        for (const RuleCase& ruleCase : rule.cases) {
+            if (!ruleCase.hasCondition || evaluate(ruleCase.condition, bound) != 0) {
+                chosen = &ruleCase;
+                break;
+            }
+        }
+        if (chosen == nullptr) throw errorAt(rule.line, "no case fits " + describe(a) + " vs " + describe(b));
+
+        build(chosen->result);
+        rewire();
+        net.remove(a);
+        net.remove(b);
     }
 
     void annihilate(std::size_t a, std::size_t b) {
