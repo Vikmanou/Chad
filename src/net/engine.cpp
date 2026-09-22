@@ -181,7 +181,11 @@ private:
         if (first == breed::Chad && second == breed::Chad) return annihilate(a, b);
 
         const int index = program.findRule(first, second);
-        if (index < 0) throw errorAt(net[a].line, "no rule for " + describe(a) + " vs " + describe(b));
+        if (index < 0) {
+            const std::size_t named = first >= second ? a : b;
+            const std::size_t other = first >= second ? b : a;
+            throw errorAt(net[named].line, "no rule for " + describe(named) + " vs " + describe(other));
+        }
 
         apply(program.rules[static_cast<std::size_t>(index)], a, b);
     }
