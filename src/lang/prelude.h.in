@@ -1,0 +1,7 @@
+#pragma once
+
+namespace chad {
+
+inline constexpr const char* PRELUDE_SOURCE = R"chad_prelude(@CHAD_PRELUDE@)chad_prelude";
+
+}
