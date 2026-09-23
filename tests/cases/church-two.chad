@@ -1,0 +1,7 @@
+Inc(r) vs n         => r ~ n + 1
+Digit(w, next) vs n => Say['0' + n](next) ~ w
+
+main
+  Chad(Rep(Chad(x, y), Chad(y, r)), Chad(x, r)) ~ Chad(Chad(Inc(n), n), g)
+  g ~ Chad(0, out)
+  out ~ Digit(world, Ghost)

@@ -50,6 +50,7 @@ private:
     std::vector<std::size_t> dying;
     std::vector<bool> visited;
     std::vector<std::int64_t> bound;
+    std::uint64_t nextLabel = 1;
 
     std::string describe(std::size_t node) const {
         const Node& chad = net[node];
@@ -155,6 +156,8 @@ private:
             for (const Code& code : chad.values) {
                 net[node].values.push_back(evaluate(code, bound));
             }
+
+            if (chad.breed == breed::Rep) net[node].label = nextLabel++;
         }
 
         for (const auto& [x, y] : result.links) {
@@ -179,6 +182,7 @@ private:
         if (second == breed::Ghost) return erase(b, a);
         if (first == breed::World) return meetWorld(b, a);
         if (second == breed::World) return meetWorld(a, b);
+        if (first == breed::Rep && second == breed::Rep && net[a].label == net[b].label) return annihilate(a, b);
         if (first == breed::Rep) return commute(a, b);
         if (second == breed::Rep) return commute(b, a);
         if (first == breed::Chad && second == breed::Chad) return annihilate(a, b);
