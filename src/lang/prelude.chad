@@ -3,7 +3,6 @@ Print(w, next) vs Nil        => next ~ w
 Print(w, next) vs Cons[c](s) => Say[c](w2) ~ w, s ~ Print(w2, next)
 
 ngl Show: spell a number's digits, then Print them
-ngl Spell counts on n <= 0 so INT64_MIN still works
 Show(w, next) vs n
   if n < 0 => Say['-'](w2) ~ w, n ~ Spell(w2, next, Nil)
   else     => 0 - n ~ Spell(w, next, Nil)
