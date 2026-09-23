@@ -11,6 +11,7 @@
 #include "chad/lang/program.h"
 #include "chad/net/expr.h"
 #include "chad/net/net.h"
+#include "chad/runtime/input.h"
 #include "chad/runtime/io.h"
 #include "chad/runtime/utf8.h"
 
@@ -242,6 +243,7 @@ private:
 
     void meetWorld(std::size_t chad, std::size_t world) {
         if (net[chad].breed == breed::Say) return say(chad, world);
+        if (net[chad].breed == breed::Read) return read(chad, world);
 
         throw errorAt(net[chad].line, describe(chad) + " faced the World", "only `Say` and `Read` can");
     }
@@ -255,6 +257,20 @@ private:
         const Port next = net[chad].ports[1];
         net.remove(chad);
         net.link(Port{world, 0}, next);
+    }
+
+    void read(std::size_t chad, std::size_t world) {
+        const std::optional<std::int64_t> c = readCodePoint();
+
+        const std::size_t got = net.add(c ? breed::Number : breed::Eof, 0, net[chad].line);
+        if (c) net[got].values.push_back(*c);
+
+        collectOutside({chad});
+        insides[0].port = Port{world, 0};
+        insides[1].port = Port{got, 0};
+
+        rewire();
+        net.remove(chad);
     }
 };
 
