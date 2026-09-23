@@ -10,3 +10,21 @@ Show(w, next) vs n
 Spell(w, next, s) vs n
   if n > -10 => Cons['0' - n](s) ~ Print(w, next)
   else       => n / 10 ~ Spell(w, next, Cons['0' - n % 10](s))
+
+ngl Math: `a ~ Add(r, b)` puts a + b on r
+Add(r, y) vs n     => y ~ AddWith[n](r)
+AddWith[a](r) vs b => r ~ a + b
+Sub(r, y) vs n     => y ~ SubWith[n](r)
+SubWith[a](r) vs b => r ~ a - b
+Mul(r, y) vs n     => y ~ MulWith[n](r)
+MulWith[a](r) vs b => r ~ a * b
+Div(r, y) vs n     => y ~ DivWith[n](r)
+DivWith[a](r) vs b => r ~ a / b
+Mod(r, y) vs n     => y ~ ModWith[n](r)
+ModWith[a](r) vs b => r ~ a % b
+Eq(r, y) vs n      => y ~ EqWith[n](r)
+EqWith[a](r) vs b  => r ~ a == b
+Lt(r, y) vs n      => y ~ LtWith[n](r)
+LtWith[a](r) vs b  => r ~ a < b
+Gt(r, y) vs n      => y ~ GtWith[n](r)
+GtWith[a](r) vs b  => r ~ a > b
