@@ -244,6 +244,7 @@ private:
     void meetWorld(std::size_t chad, std::size_t world) {
         if (net[chad].breed == breed::Say) return say(chad, world);
         if (net[chad].breed == breed::Read) return read(chad, world);
+        if (net[chad].breed == breed::Rep) throw errorAt(net[chad].line, "can't clone the world", "a `Rep` faced the World");
 
         throw errorAt(net[chad].line, describe(chad) + " faced the World", "only `Say` and `Read` can");
     }
