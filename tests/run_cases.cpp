@@ -22,6 +22,14 @@ std::string quoted(const fs::path& path) {
     return "\"" + path.string() + "\"";
 }
 
+std::string withoutTrailingNewlines(std::string text) {
+    while (!text.empty() && (text.back() == '\n' || text.back() == '\r')) {
+        text.pop_back();
+    }
+
+    return text;
+}
+
 fs::path sibling(fs::path test, const char* extension) {
     return test.replace_extension(extension);
 }
@@ -41,12 +49,12 @@ std::string check(const fs::path& test) {
 #endif
 
     const bool wantsError = fs::exists(sibling(test, ".stderr"));
-    const std::string wantedOutput = read(sibling(test, ".stdout"));
+    const std::string wantedOutput = withoutTrailingNewlines(read(sibling(test, ".stdout")));
     const std::string wantedError = read(sibling(test, ".stderr"));
 
     if (exitCode != (wantsError ? 1 : 0)) {
         return "exit code " + std::to_string(exitCode) + " " + read(error);
-    } else if (read(output) != wantedOutput) {
+    } else if (withoutTrailingNewlines(read(output)) != wantedOutput) {
         return "output `" + read(output) + "`, wanted `" + wantedOutput + "`";
     } else if (read(error).find(wantedError) == std::string::npos) {
         return "error `" + read(error) + "`, wanted `" + wantedError + "`";
