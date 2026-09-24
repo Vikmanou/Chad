@@ -26,5 +26,5 @@ endif()
 add_subdirectory(src)
 add_subdirectory(app)
 
-#enable_testing()
-#add_subdirectory(tests)
+enable_testing()
+add_subdirectory(tests)
