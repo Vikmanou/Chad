@@ -1,0 +1,7 @@
+ngl show n, then pass the World to the next Count
+Count(w, next) vs n
+  if n < 0 => next ~ w
+  else     => n ~ Show(w, Say['\n'](w2)), n - 1 ~ Count(w2, next)
+
+main
+  9 ~ Count(world, Ghost)
