@@ -1,0 +1,8 @@
+ngl multiply the value by each number on the way down
+Fact[acc](r) vs n
+  if n <= 1 => r ~ acc
+  else      => n - 1 ~ Fact[acc * n](r)
+
+main
+  "n = " ~ Ask(world, w, n)
+  n ~ Fact[1](Show(w, Say['\n'](Ghost)))
