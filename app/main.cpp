@@ -8,6 +8,7 @@
 #endif
 
 #include "chad/core/file.h"
+#include "chad/core/error.h"
 #include "chad/compiler/program.h"
 #include "cli.h"
 
@@ -45,7 +46,13 @@ int main(int argc, char** argv) {
 
     useBinaryStreams();
 
-    const chad::Program program = chad::compile(*source);
+    try {
+        const chad::Program program = chad::compile(*source);
+    } catch (const chad::Error& error) {
+        std::fflush(stdout);
+        std::cerr << error.what() << "\n";
+        return 1;
+    }
 
     std::cout << " chad!" << std::endl;
 
