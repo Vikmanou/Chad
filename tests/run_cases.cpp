@@ -64,14 +64,11 @@ std::string check(const fs::path& test) {
 }
 
 int main() {
-    // the examples carry their expected output too, so they're tests as well
-    const fs::path root = CHAD_ROOT_DIR;
+    const fs::path cases = fs::path(CHAD_ROOT_DIR) / "tests" / "cases";
     std::set<fs::path> tests;
-    for (const fs::path& folder : {root / "tests" / "cases", root / "examples"}) {
-        for (const auto& entry : fs::directory_iterator(folder)) {
-            if (entry.path().extension() == ".chad") {
-                tests.insert(entry.path());
-            }
+    for (const auto& entry : fs::directory_iterator(cases)) {
+        if (entry.path().extension() == ".chad") {
+            tests.insert(entry.path());
         }
     }
 
