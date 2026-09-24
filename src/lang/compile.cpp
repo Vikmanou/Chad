@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "chad/core/error.h"
+#include "chad/core/text.h"
 #include "chad/lang/ast.h"
 #include "chad/lang/lexer.h"
 #include "chad/lang/parser.h"
@@ -42,8 +43,16 @@ public:
         addBuiltin("Nil", 0, 0);
     }
 
-    void addRules(const ast::Source& source, bool prelude) {
-        lineSign = prelude ? -1 : 1;
+    void addPreludeRules(const ast::Source& source, int lineOffset) {
+        inPrelude = true;
+        preludeOffset = lineOffset;
+        for (const ast::Rule& rule : source.rules) {
+            addRule(rule);
+        }
+    }
+
+    void addRules(const ast::Source& source) {
+        inPrelude = false;
         for (const ast::Rule& rule : source.rules) {
             addRule(rule);
         }
@@ -65,7 +74,7 @@ public:
     }
 
     int at(int line) const {
-        return line * lineSign;
+        return inPrelude ? -(preludeOffset + line) : line;
     }
 
     // every use of a breed must have the same number of values and arms as the first one
@@ -129,7 +138,8 @@ private:
     Program program;
     std::map<std::string, Breed> breedIds;
     std::map<std::pair<Breed, Breed>, int> ruleLines; // each pair of breeds
-    int lineSign = 1;
+    bool inPrelude = false;
+    int preludeOffset = 0;
 
     void addBuiltin(const std::string& name, std::size_t valueCount, std::size_t armCount) {
         if (name != "number") {
@@ -469,7 +479,7 @@ void Compiler::addRule(const ast::Rule& rule) {
 }
 
 void Compiler::addMain(const ast::Source& source) {
-    lineSign = 1;
+    inPrelude = false;
     if (!source.hasMain) throw errorAt(1, "no `main`", "a program starts from its `main` block");
 
     Scope scope;
@@ -484,11 +494,16 @@ void Compiler::addMain(const ast::Source& source) {
 
 Program compile(const std::string& source) {
     Compiler compiler;
-    compiler.addRules(parse(lex(PRELUDE_SOURCE)), true);
+
+    int lineOffset = 0;
+    for (const PreludeFile& file : PRELUDE_FILES) {
+        compiler.addPreludeRules(parse(lex(file.source)), lineOffset);
+        lineOffset += countLines(file.source);
+    }
 
     const ast::Source program = parse(lex(source));
 
-    compiler.addRules(program, false);
+    compiler.addRules(program);
     compiler.addMain(program);
 
     return compiler.finish();

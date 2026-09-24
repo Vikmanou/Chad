@@ -2,6 +2,12 @@
 
 namespace chad {
 
-inline constexpr const char* PRELUDE_SOURCE = R"chad_prelude(@CHAD_PRELUDE@)chad_prelude";
+struct PreludeFile {
+    const char* name;
+    const char* source;
+};
+
+inline constexpr PreludeFile PRELUDE_FILES[] = {
+@CHAD_PRELUDE_FILES@};
 
 }

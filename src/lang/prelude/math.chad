@@ -1,16 +1,4 @@
-ngl Print: say each character of a string
-Print(w, next) vs Nil        => next ~ w
-Print(w, next) vs Cons[c](s) => Say[c](w2) ~ w, s ~ Print(w2, next)
-
-ngl Show: spell a number's digits, then Print them
-Show(w, next) vs n
-  if n < 0 => Say['-'](w2) ~ w, n ~ Spell(w2, next, Nil)
-  else     => 0 - n ~ Spell(w, next, Nil)
-Spell(w, next, s) vs n
-  if n > -10 => Cons['0' - n](s) ~ Print(w, next)
-  else       => n / 10 ~ Spell(w, next, Cons['0' - n % 10](s))
-
-ngl Math: `a ~ Add(r, b)` puts a + b on r
+ngl `a ~ Add(r, b)` puts a + b on r
 Add(r, y) vs n     => y ~ AddWith[n](r)
 AddWith[a](r) vs b => r ~ a + b
 Sub(r, y) vs n     => y ~ SubWith[n](r)
