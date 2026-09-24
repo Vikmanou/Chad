@@ -9,7 +9,7 @@ TokenList lex(const std::string& source) {
 
     int idx = 0;
     while (idx < source.size()) {
-        ++i
+        ++idx;
     }
 
     return tokens;
