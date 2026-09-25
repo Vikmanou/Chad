@@ -1,48 +1,61 @@
 # Chad
 
-Chad is a stack based esoteric programming language aimed to be chad.
+Chad is an esoteric programming language based on interaction networks aimed to be chad.
 
 Chad is cool. Chad is great. Chad needs no dependencies. Chad works alone. All is good.
 
 ## Example
 
 ```
-ngl Counts 9 down to 0
-9
-[ rep sayn 1 - ]
-sayn
+ngl show n then pass the World to the next Count
+Count(w, next) vs n
+  if n < 0 => next ~ w
+  else => n ~ Show(w, Say['\n'](w2)), n - 1 ~ Count(w2, next)
+
+main
+  9 ~ Count(world, Ghost)
 ```
 
 More in `examples/`.
 
-## Instructions
+## How it works
 
-Everything is a 64-bit integer on one stack. Tokens are separated by whitespace. Words are case-insensitive.
+A program is a net of Chads connected by wires. Each Chad has one face and some arms. When two Chads meet face to face, the rule for their pair replaces both of them. The program runs until no two faces meet.
 
-In the stack column, `a b` means `b` is on top.
+- `A(x, y)` is a Chad of breed `A` with arms `x` and `y`.
+- `A[1, 2](x)` also carries the values `1` and `2`.
+- `a ~ b` connects `a` and `b` with a wire.
+- A number like `42` is a Chad too. A name like `w` is a wire.
+- `A(x) vs B(y) => ...` is the rule for when `A` meets `B`. `A(x) vs n` matches any number `n`.
+- A rule can have cases: `if cond => ...` and a final `else => ...`. The first case that fits is used.
+- `main` is the net the program starts with. `world` is the wire to the World, and it must be used exactly once.
+- `ngl` starts a comment until the end of the line.
 
-| Instruction | Stack | Does |
-| --- | --- | --- |
-| `42`, `-7` | → `n` | push the number |
-| `rep` | `a` → `a a` | duplicate top |
-| `ghost` | `a` → | drop top |
-| `pivot` | `a b` → `b a` | swap top two |
-| `+` | `a b` → `a+b` | add (wraps on overflow) |
-| `-` | `a b` → `a-b` | subtract (wraps) |
-| `*` | `a b` → `a*b` | multiply (wraps) |
-| `/` | `a b` → `a/b` | divide, rounds toward zero; error if `b` is 0 |
-| `%` | `a b` → `a%b` | remainder; error if `b` is 0 |
-| `mogs` | `a b` → `a>b` | 1 if `a` is greater than `b`, else 0 |
-| `cope` | `a` → `!a` | 1 if `a` is 0, else 0 |
-| `[` | `a` → `a` | if top is 0, jump past the matching `]` |
-| `]` | `a` → `a` | if top is not 0, jump back past the matching `[` |
-| `sayc` | `a` → | print `a` as a UTF-8 character |
-| `sayn` | `a` → | print `a` as a number |
-| `readc` | → `c` | read one UTF-8 character from stdin |
-| `readn` | → `n` | read a number from stdin |
-| `ngl` | | comment until end of line |
+Values are 64-bit integers. They support `+ - * / %`, `== != < <= > >=` and `and`, `or`, `not`. `'a'` is the character's number. `"hi"` is `Cons['h'](Cons['i'](Nil))`.
 
-`[` and `]` only look at the top of the stack. They don't pop it. Running an instruction with too few values on the stack is an error.
+## Built-in breeds
+
+| Breed | Does |
+| --- | --- |
+| `Say[c](next)` | when it meets the World, prints `c` as a UTF-8 character and gives the World to `next` |
+| `Read(w, out)` | when it meets the World, reads one UTF-8 character into `out` (`Eof` at the end) and gives the World to `w` |
+| `Ghost` | erases whatever it meets |
+| `Rep(a, b)` | copies whatever it meets into `a` and `b` |
+| `Chad(in, out)` | a function. Two `Chad`s meeting connect their arms |
+| `Cons[x](rest)`, `Nil` | lists |
+| `Eof` | end of input |
+
+## Prelude
+
+Every program includes these integrated Chad functionalities (directly written in Chad):
+
+| Breed | Does |
+| --- | --- |
+| `Print(w, next)` | prints a string |
+| `Show(w, next)` | prints a number |
+| `Num(w, next, out)` | reads a number into `out` (`Eof` at the end) |
+| `Add(r, b)`, `Sub`, `Mul`, `Div`, `Mod` | `a ~ Add(r, b)` puts `a + b` on `r` |
+| `Eq(r, b)`, `Lt`, `Gt` | same, but compares |
 
 ## Build
 
