@@ -10,9 +10,9 @@
 #include "chad/core/error.h"
 #include "chad/core/file.h"
 #include "chad/lang/compile.h"
-#include "chad/lang/lexer.h"
 #include "chad/lang/program.h"
 #include "chad/net/engine.h"
+#include "chad/runtime/io.h"
 #include "cli.h"
 
 namespace {
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
         const chad::Program program = chad::compile(*source);
         chad::run(program);
     } catch (const chad::Error& error) {
-        std::fflush(stdout);
+        chad::flushOutput();
         std::cerr << error.what() << "\n";
         return 1;
     }
