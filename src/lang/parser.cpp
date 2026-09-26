@@ -90,6 +90,61 @@ private:
         return tokens[pos++].text;
     }
 
+    // a ~ b, c ~ d
+    std::vector<Connection> parseConnections() {
+        std::vector<Connection> connections;
+        do {
+            skipNewlines();
+            Connection connection;
+            connection.line = peek().line;
+            connection.left = parseTerm();
+            expectSymbol("~");
+            skipNewlines();
+            connection.right = parseTerm();
+            connections.push_back(std::move(connection));
+        } while (acceptSymbol(","));
+        return connections;
+    }
+
+    Term parseTerm() {
+        Term term;
+        term.line = peek().line;
+
+        if (peek().kind == TokenKind::Breed) {
+            term.kind = TermKind::Chad;
+            term.name = tokens[pos++].text;
+            if (acceptSymbol("[")) {
+                do {
+                    term.values.push_back(parseExpr());
+                } while (acceptSymbol(","));
+                expectSymbol("]");
+            }
+            if (acceptSymbol("(") && !acceptSymbol(")")) {
+                do {
+                    term.arms.push_back(parseTerm());
+                } while (acceptSymbol(","));
+                expectSymbol(")");
+            }
+            return term;
+        }
+
+        if (peek().kind == TokenKind::String) {
+            term.kind = TermKind::String;
+            term.text = tokens[pos++].chars;
+            return term;
+        }
+
+        Expr value = parseExpr();
+        if (value.kind == ExprKind::Name) {
+            term.kind = TermKind::Name;
+            term.name = value.name;
+        } else {
+            term.kind = TermKind::Value;
+            term.value = std::move(value);
+        }
+        return term;
+    }
+
     // lowest to highest: or, and, not, comparisons, + -, * / %, unary -
     Expr parseExpr() {
         Expr left = parseAnd();
