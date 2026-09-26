@@ -10,9 +10,7 @@
 #include "chad/core/error.h"
 #include "chad/core/file.h"
 #include "chad/lang/program.h"
-#include "chad/runtime/interpreter.h"
 #include "cli.h"
-
 
 namespace {
 // take a wild guess who is responsible for this... Windows.
@@ -48,7 +46,8 @@ int main(int argc, char** argv) {
 
     try {
         const chad::Program program = chad::compile(*source);
-        chad::run(program);
+        std::cout << "NOT IMPLEMENTED" << std::endl;
+        // chad::run(program);
     } catch (const chad::Error& error) {
         std::fflush(stdout);
         std::cerr << error.what() << "\n";
