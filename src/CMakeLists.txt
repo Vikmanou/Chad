@@ -5,6 +5,7 @@ add_library(chad_core
     lang/lexer.cpp
     lang/parser.cpp
     lang/compile.cpp
+    net/engine.cpp
     runtime/io.cpp
     runtime/utf8.cpp
     runtime/input.cpp
