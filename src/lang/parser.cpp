@@ -112,6 +112,9 @@ private:
     void parseMain() {
         const int line = peek().line;
         ++pos;
+        if (source.hasMain) {
+            throw errorAt(line, "second `main`", "a program has one `main`");
+        }
         source.hasMain = true;
         source.mainLine = line;
 
