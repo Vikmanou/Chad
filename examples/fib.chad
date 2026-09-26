@@ -1,7 +1,7 @@
 ngl split into two smaller Fibs and Add their answers
 Fib(r) vs n
   if n < 2 => r ~ n
-  else     => n - 1 ~ Fib(a), n - 2 ~ Fib(b), a ~ Add(r, b)
+  else     => n - 1 ~ Fib(a), n - 2 ~ Fib(b), a ~ Add(b, r)
 
 main
   10 ~ Fib(r)

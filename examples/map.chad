@@ -9,5 +9,5 @@ ShowMore(w, next) vs Nil         => next ~ w
 ShowMore(w, next) vs Cons[x](s)  => Say[' '](w2) ~ w, x ~ Show(w2, w3), s ~ ShowMore(w3, next)
 
 main
-  Cons[1](Cons[2](Cons[3](Nil))) ~ Map(Fn(Mul(r, 2), r), doubled)
+  Cons[1](Cons[2](Cons[3](Nil))) ~ Map(Fn(Mul(2, r), r), doubled)
   doubled ~ ShowAll(world, Say['\n'](Ghost))

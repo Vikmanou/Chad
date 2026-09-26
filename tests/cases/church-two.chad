@@ -1,5 +1,5 @@
 ngl two = λf. λx. f (f x)
 main
-  Fn(Rep(Fn(x, y), Fn(y, r)), Fn(x, r)) ~ Fn(Fn(Add(n, 1), n), g)
+  Fn(Rep(Fn(x, y), Fn(y, r)), Fn(x, r)) ~ Fn(Fn(Add(1, n), n), g)
   g ~ Fn(0, out)
   out ~ Show(world, Say['\n'](Ghost))

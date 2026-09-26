@@ -54,8 +54,8 @@ Every program includes these integrated Chad functionalities (directly written i
 | `Print(w, next)` | prints a string |
 | `Show(w, next)` | prints a number |
 | `HearNum(w, next, out)` | reads a number into `out` (`Silence` at the end) |
-| `Add(r, b)`, `Sub`, `Mul`, `Div`, `Mod` | `a ~ Add(r, b)` puts `a + b` on `r` |
-| `Eq(r, b)`, `Lt`, `Gt` | same, but compares |
+| `Add(b, out)`, `Sub`, `Mul`, `Div`, `Mod` | `a ~ Add(b, out)` puts `a + b` on `out` |
+| `Eq(b, out)`, `Lt`, `Gt` | same, but compares |
 
 ## Build
 

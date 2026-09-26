@@ -1,17 +1,17 @@
-ngl `a ~ Add(r, b)` puts a + b on r
-Add(r, y) vs n     => y ~ AddWith[n](r)
+ngl `a ~ Add(b, r)` puts a + b on r
+Add(b, r) vs a     => b ~ AddWith[a](r)
 AddWith[a](r) vs b => r ~ a + b
-Sub(r, y) vs n     => y ~ SubWith[n](r)
+Sub(b, r) vs a     => b ~ SubWith[a](r)
 SubWith[a](r) vs b => r ~ a - b
-Mul(r, y) vs n     => y ~ MulWith[n](r)
+Mul(b, r) vs a     => b ~ MulWith[a](r)
 MulWith[a](r) vs b => r ~ a * b
-Div(r, y) vs n     => y ~ DivWith[n](r)
+Div(b, r) vs a     => b ~ DivWith[a](r)
 DivWith[a](r) vs b => r ~ a / b
-Mod(r, y) vs n     => y ~ ModWith[n](r)
+Mod(b, r) vs a     => b ~ ModWith[a](r)
 ModWith[a](r) vs b => r ~ a % b
-Eq(r, y) vs n      => y ~ EqWith[n](r)
+Eq(b, r) vs a      => b ~ EqWith[a](r)
 EqWith[a](r) vs b  => r ~ a == b
-Lt(r, y) vs n      => y ~ LtWith[n](r)
+Lt(b, r) vs a      => b ~ LtWith[a](r)
 LtWith[a](r) vs b  => r ~ a < b
-Gt(r, y) vs n      => y ~ GtWith[n](r)
+Gt(b, r) vs a      => b ~ GtWith[a](r)
 GtWith[a](r) vs b  => r ~ a > b
