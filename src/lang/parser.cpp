@@ -41,8 +41,11 @@ public:
     Source run() {
         skipNewlines();
         while (!atEnd()) {
-            if (!isWord("main")) fail("`main`");
-            parseMain();
+            if (isWord("main")) {
+                parseMain();
+            } else {
+                parseRule();
+            }
             skipNewlines();
         }
         return std::move(source);
@@ -121,6 +124,53 @@ private:
             }
             expectLineEnd();
         }
+    }
+
+    // Left vs Right => connections
+    void parseRule() {
+        Rule rule;
+        rule.line = peek().line;
+        rule.left = parsePattern();
+        if (!isWord("vs")) fail("`vs`");
+        ++pos;
+        rule.right = parsePattern();
+
+        expectSymbol("=>");
+        Case single;
+        single.line = rule.line;
+        skipNewlines();
+        single.connections = parseConnections();
+        expectLineEnd();
+        rule.cases.push_back(std::move(single));
+        source.rules.push_back(std::move(rule));
+    }
+
+    // Breed[values](arms), or a name for a number Chad
+    Pattern parsePattern() {
+        Pattern pattern;
+        pattern.line = peek().line;
+
+        if (peek().kind == TokenKind::Name && !isKeyword(peek().text)) {
+            pattern.isNumber = true;
+            pattern.values.push_back(tokens[pos++].text);
+            return pattern;
+        }
+        if (peek().kind != TokenKind::Breed) fail("a Chad to match, like `Fib(r)` or `n`");
+
+        pattern.breed = tokens[pos++].text;
+        if (acceptSymbol("[")) {
+            do {
+                pattern.values.push_back(takeName("a value name"));
+            } while (acceptSymbol(","));
+            expectSymbol("]");
+        }
+        if (acceptSymbol("(") && !acceptSymbol(")")) {
+            do {
+                pattern.arms.push_back(takeName("a wire name"));
+            } while (acceptSymbol(","));
+            expectSymbol(")");
+        }
+        return pattern;
     }
 
     // a ~ b, c ~ d
