@@ -1,0 +1,8 @@
+ngl put each character in front of the ones before it
+Rev(w, next, s) vs Eof => s ~ Print(w, next)
+Rev(w, next, s) vs c
+  if c == '\n' => s ~ Print(w, Say['\n'](next))
+  else => Read(w2, Rev(w2, next, Cons[c](s))) ~ w
+
+main
+  world ~ Read(w, Rev(w, Ghost, Nil))

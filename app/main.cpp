@@ -3,15 +3,17 @@
 #include <string>
 
 #ifdef _WIN32
-    #include <fcntl.h>
-    #include <io.h>
+#include <fcntl.h>
+#include <io.h>
 #endif
 
-#include "chad/core/file.h"
 #include "chad/core/error.h"
-#include "chad/compiler/program.h"
+#include "chad/core/file.h"
+#include "chad/lang/compile.h"
+#include "chad/lang/program.h"
+#include "chad/net/engine.h"
+#include "chad/runtime/io.h"
 #include "cli.h"
-#include "chad/runtime/interpreter.h"
 
 namespace {
 // take a wild guess who is responsible for this... Windows.
@@ -49,7 +51,7 @@ int main(int argc, char** argv) {
         const chad::Program program = chad::compile(*source);
         chad::run(program);
     } catch (const chad::Error& error) {
-        std::fflush(stdout);
+        chad::flushOutput();
         std::cerr << error.what() << "\n";
         return 1;
     }

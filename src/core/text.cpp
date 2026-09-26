@@ -19,4 +19,13 @@ std::string toLowercase(std::string str) {
     return str;
 }
 
+int countLines(const std::string& text) {
+    int lines = 1;
+    for (const char c : text) {
+        if (c == '\n') lines++;
+    }
+
+    return lines;
+}
+
 }

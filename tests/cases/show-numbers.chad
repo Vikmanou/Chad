@@ -1,0 +1,6 @@
+main
+  0 ~ Show(world, Say['\n'](a))
+  -7 ~ Show(a, Say['\n'](b))
+  1234567890 ~ Show(b, Say['\n'](c))
+  -9223372036854775807 - 1 ~ Show(c, Say['\n'](d))
+  9223372036854775807 ~ Show(d, Say['\n'](Ghost))

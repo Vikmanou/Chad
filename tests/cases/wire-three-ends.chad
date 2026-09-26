@@ -1,0 +1,4 @@
+main
+  x ~ Ghost
+  x ~ Nil
+  x ~ Eof

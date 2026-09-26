@@ -4,17 +4,19 @@
 #include "chad/runtime/io.h"
 #include "chad/runtime/utf8.h"
 
+#include <optional>
+
 namespace chad {
 
-std::int64_t readCodePoint() {
+std::optional<std::int64_t> readCodePoint() {
     const int firstByte = readByte();
-    if (firstByte < 0) return 0;
+    if (firstByte < 0) return std::nullopt;
 
-    const int byteCount = utf8::charByteCount(static_cast<unsigned char>(firstByte));
+    const std::size_t byteCount = utf8::charByteCount(static_cast<unsigned char>(firstByte));
     if (byteCount <= 1) return firstByte;
 
     std::int64_t codePoint = utf8::firstByteBits(static_cast<unsigned char>(firstByte), byteCount);
-    for (int i = 1; i < byteCount; ++i) {
+    for (std::size_t i = 1; i < byteCount; ++i) {
         const int nextByte = readByte();
         if (nextByte < 0 || !utf8::isContinuationByte(static_cast<unsigned char>(nextByte))) {
             return firstByte;
@@ -23,28 +25,6 @@ std::int64_t readCodePoint() {
     }
 
     return codePoint;
-}
-
-std::int64_t readNumber() {
-    int byte = readByte();
-    while (byte >= 0 && isSpace(static_cast<char>(byte))) {
-        byte = readByte();
-    }
-    if (byte < 0) return 0;
-
-    bool negative = false;
-    if (byte == '-') {
-        negative = true;
-        byte = readByte();
-    }
-
-    std::uint64_t value = 0;
-    while (byte >= 0 && isDigit(static_cast<char>(byte))) {
-        value = value * 10 + static_cast<std::uint64_t>(byte - '0');
-        byte = readByte();
-    }
-
-    return static_cast<std::int64_t>(negative ? 0 - value : value);
 }
 
 }

@@ -1,11 +1,10 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 
 namespace chad {
 
-std::int64_t readCodePoint();
-
-std::int64_t readNumber();
+std::optional<std::int64_t> readCodePoint();
 
 }

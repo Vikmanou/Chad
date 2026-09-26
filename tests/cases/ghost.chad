@@ -1,0 +1,3 @@
+main
+  "junk" ~ Ghost
+  world ~ Say['o'](Say['k'](Ghost))

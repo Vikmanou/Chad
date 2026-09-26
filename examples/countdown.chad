@@ -1,4 +1,7 @@
-ngl Counts 9 down to 0
-9
-[ rep sayn 1 - ]
-sayn
+ngl show n, then pass the World to the next Count
+Count(w, next) vs n
+  if n < 0 => next ~ w
+  else     => n ~ Show(w, Say['\n'](w2)), n - 1 ~ Count(w2, next)
+
+main
+  9 ~ Count(world, Ghost)

@@ -1,5 +1,6 @@
 BasedOnStyle: LLVM
 IndentWidth: 4
+ColumnLimit: 0
 AccessModifierOffset: -4
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: WithoutElse
@@ -13,3 +14,6 @@ FixNamespaceComments: false
 SortIncludes: CaseSensitive
 IncludeBlocks: Preserve
 InsertNewlineAtEOF: false
+AlignTrailingComments: false
+AllowShortEnumsOnASingleLine: false
+BreakBeforeTernaryOperators: false

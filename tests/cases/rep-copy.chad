@@ -1,0 +1,4 @@
+main
+  "ab" ~ Rep(x, y)
+  x ~ Print(world, Say['\n'](w))
+  y ~ Print(w, Ghost)

@@ -1,0 +1,5 @@
+Inc(r) vs n => r ~ r + 1
+
+main
+  1 ~ Inc(x)
+  x ~ Ghost

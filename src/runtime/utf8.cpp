@@ -9,7 +9,7 @@ bool isValidChar(std::int64_t codePoint) {
     return codePoint < 0xD800 || codePoint > 0xDFFF;
 }
 
-int charByteCount(unsigned char firstByte) {
+std::size_t charByteCount(unsigned char firstByte) {
     if (firstByte < 0x80) {
         return 1;
     } else if ((firstByte & 0xE0) == 0xC0) {
@@ -26,7 +26,7 @@ bool isContinuationByte(unsigned char byte) {
     return (byte & 0xC0) == 0x80;
 }
 
-std::int64_t firstByteBits(unsigned char firstByte, int byteCount) {
+std::int64_t firstByteBits(unsigned char firstByte, std::size_t byteCount) {
     return firstByte & (0x7F >> byteCount);
 }
 

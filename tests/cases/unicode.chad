@@ -1,0 +1,3 @@
+main
+  "héllo → 🗿" ~ Print(world, w)
+  "" ~ Print(w, Ghost)

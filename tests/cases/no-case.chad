@@ -1,0 +1,6 @@
+Pos(r) vs n
+  if n > 0 => r ~ n
+
+main
+  -1 ~ Pos(r)
+  r ~ Ghost

@@ -1,0 +1,10 @@
+ngl Guess keeps the secret as a value
+Guess[s](w, next) vs Eof => next ~ w
+Guess[s](w, next) vs g
+  if g < s => "Higher\nGuess: " ~ Ask(w, w2, h), h ~ Guess[s](w2, next)
+  if g > s => "Lower\nGuess: " ~ Ask(w, w2, h), h ~ Guess[s](w2, next)
+  else     => "Chad.\n" ~ Print(w, next)
+
+main
+  "Guess: " ~ Ask(world, w, g)
+  g ~ Guess[42](w, Ghost)

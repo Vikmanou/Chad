@@ -1,0 +1,13 @@
+#pragma once
+
+namespace chad {
+
+struct PreludeFile {
+    const char* name;
+    const char* source;
+};
+
+inline constexpr PreludeFile PRELUDE_FILES[] = {
+@CHAD_PRELUDE_FILES@};
+
+}

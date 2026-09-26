@@ -1,0 +1,3 @@
+main
+  Chad(a, b) ~ Chad(b, a)
+  world ~ Say['o'](Say['k'](Ghost))
