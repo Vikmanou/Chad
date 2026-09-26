@@ -50,15 +50,19 @@ std::string check(const fs::path& test) {
     } else if (read(error).find(wantedError) == std::string::npos) {
         return "error `" + read(error) + "`, wanted `" + wantedError + "`";
     }
-    
+
     return "";
 }
 
 int main() {
+    // the examples carry their expected output too, so they're tests as well
+    const fs::path root = CHAD_ROOT_DIR;
     std::set<fs::path> tests;
-    for (const auto& entry : fs::directory_iterator(fs::path(CHAD_ROOT_DIR) / "tests" / "cases")) {
-        if (entry.path().extension() == ".chad") {
-            tests.insert(entry.path());
+    for (const fs::path& folder : {root / "tests" / "cases", root / "examples"}) {
+        for (const auto& entry : fs::directory_iterator(folder)) {
+            if (entry.path().extension() == ".chad") {
+                tests.insert(entry.path());
+            }
         }
     }
 
