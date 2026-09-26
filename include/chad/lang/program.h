@@ -8,6 +8,4 @@ namespace chad {
 struct Program {
 };
 
-Program compile(const std::string& source);
-
 }

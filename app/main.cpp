@@ -9,6 +9,7 @@
 
 #include "chad/core/error.h"
 #include "chad/core/file.h"
+#include "chad/lang/compile.h"
 #include "chad/lang/lexer.h"
 #include "chad/lang/program.h"
 #include "cli.h"
