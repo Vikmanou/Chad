@@ -41,7 +41,7 @@ Values are 64-bit integers. They support `+ - * / %`, `== != < <= > >=` and `and
 | `Read(w, out)` | when it meets the World, reads one UTF-8 character into `out` (`Eof` at the end) and gives the World to `w` |
 | `Ghost` | erases whatever it meets |
 | `Rep(a, b)` | copies whatever it meets into `a` and `b` |
-| `Chad(in, out)` | a function. Two `Chad`s meeting connect their arms |
+| `Fn(in, out)` | a function. Two `Fn`s meeting join their arms |
 | `Cons[x](rest)`, `Nil` | lists |
 | `Eof` | end of input |
 

@@ -16,7 +16,7 @@ using Breed = std::size_t;
 namespace breed {
 constexpr Breed Number = 0;
 constexpr Breed World = 1;
-constexpr Breed Chad = 2;
+constexpr Breed Fn = 2;
 constexpr Breed Rep = 3;
 constexpr Breed Ghost = 4;
 constexpr Breed Say = 5;

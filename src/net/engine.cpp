@@ -185,7 +185,7 @@ private:
         if (first == breed::Rep && second == breed::Rep && net[a].label == net[b].label) return annihilate(a, b);
         if (first == breed::Rep) return commute(a, b);
         if (second == breed::Rep) return commute(b, a);
-        if (first == breed::Chad && second == breed::Chad) return annihilate(a, b);
+        if (first == breed::Fn && second == breed::Fn) return annihilate(a, b);
 
         const int index = program.findRule(first, second);
         if (index < 0) {
