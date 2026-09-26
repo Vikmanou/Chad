@@ -20,8 +20,8 @@ constexpr Breed Fn = 2;
 constexpr Breed Rep = 3;
 constexpr Breed Ghost = 4;
 constexpr Breed Say = 5;
-constexpr Breed Read = 6;
-constexpr Breed Eof = 7;
+constexpr Breed Hear = 6;
+constexpr Breed Silence = 7;
 constexpr Breed Cons = 8;
 constexpr Breed Nil = 9;
 }

@@ -282,10 +282,10 @@ private:
 
     void meetWorld(std::size_t chad, std::size_t world) {
         if (net[chad].breed == breed::Say) return say(chad, world);
-        if (net[chad].breed == breed::Read) return read(chad, world);
+        if (net[chad].breed == breed::Hear) return hear(chad, world);
         if (net[chad].breed == breed::Rep) throw errorAt(net[chad].line, "can't clone the world", "a `Rep` faced the World");
 
-        throw errorAt(net[chad].line, describe(chad) + " faced the World", "only `Say` and `Read` can");
+        throw errorAt(net[chad].line, describe(chad) + " faced the World", "only `Say` and `Hear` can");
     }
 
     void say(std::size_t chad, std::size_t world) {
@@ -299,10 +299,10 @@ private:
         net.link(Port{world, 0}, next);
     }
 
-    void read(std::size_t chad, std::size_t world) {
+    void hear(std::size_t chad, std::size_t world) {
         const std::optional<std::int64_t> c = readCodePoint();
 
-        const std::size_t got = net.add(c ? breed::Number : breed::Eof, 0, net[chad].line);
+        const std::size_t got = net.add(c ? breed::Number : breed::Silence, 0, net[chad].line);
         if (c) net[got].values.push_back(*c);
 
         collectOutside({chad});

@@ -1,0 +1,7 @@
+ngl skips junk, stops at the first non-digit
+Each(w, next) vs Silence => next ~ w
+Each(w, next) vs n       => n ~ Show(w, Say['\n'](Hear(w2, HearNum(w2, w3, m)))), m ~ Each(w3, next)
+
+main
+  world ~ Hear(w, HearNum(w, w2, n))
+  n ~ Each(w2, Ghost)

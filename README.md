@@ -38,12 +38,12 @@ Values are 64-bit integers. They support `+ - * / %`, `== != < <= > >=` and `and
 | Breed | Does |
 | --- | --- |
 | `Say[c](next)` | when it meets the World, prints `c` as a UTF-8 character and gives the World to `next` |
-| `Read(w, out)` | when it meets the World, reads one UTF-8 character into `out` (`Eof` at the end) and gives the World to `w` |
+| `Hear(next, out)` | when it meets the World, reads one UTF-8 character into `out` (`Silence` at the end) and gives the World to `next` |
 | `Ghost` | erases whatever it meets |
 | `Rep(a, b)` | copies whatever it meets into `a` and `b` |
 | `Fn(in, out)` | a function. Two `Fn`s meeting join their arms |
 | `Cons[x](rest)`, `Nil` | lists |
-| `Eof` | end of input |
+| `Silence` | end of input |
 
 ## Prelude
 
@@ -53,7 +53,7 @@ Every program includes these integrated Chad functionalities (directly written i
 | --- | --- |
 | `Print(w, next)` | prints a string |
 | `Show(w, next)` | prints a number |
-| `Num(w, next, out)` | reads a number into `out` (`Eof` at the end) |
+| `HearNum(w, next, out)` | reads a number into `out` (`Silence` at the end) |
 | `Add(r, b)`, `Sub`, `Mul`, `Div`, `Mod` | `a ~ Add(r, b)` puts `a + b` on `r` |
 | `Eq(r, b)`, `Lt`, `Gt` | same, but compares |
 

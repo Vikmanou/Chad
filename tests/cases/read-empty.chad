@@ -1,7 +1,0 @@
-ngl no input: Num gives Eof
-First(w, next) vs Eof => "none\n" ~ Print(w, next)
-First(w, next) vs n   => n ~ Show(w, next)
-
-main
-  world ~ Read(w, Num(w, w2, n))
-  n ~ First(w2, Ghost)

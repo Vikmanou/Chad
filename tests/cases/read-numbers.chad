@@ -1,7 +1,0 @@
-ngl skips junk, stops at the first non-digit
-Each(w, next) vs Eof => next ~ w
-Each(w, next) vs n   => n ~ Show(w, Say['\n'](Read(w2, Num(w2, w3, m)))), m ~ Each(w3, next)
-
-main
-  world ~ Read(w, Num(w, w2, n))
-  n ~ Each(w2, Ghost)

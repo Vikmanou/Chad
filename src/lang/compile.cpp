@@ -37,8 +37,8 @@ public:
         addBuiltin("Rep", 0, 2);
         addBuiltin("Ghost", 0, 0);
         addBuiltin("Say", 1, 1);
-        addBuiltin("Read", 0, 2);
-        addBuiltin("Eof", 0, 0);
+        addBuiltin("Hear", 0, 2);
+        addBuiltin("Silence", 0, 0);
         addBuiltin("Cons", 1, 1);
         addBuiltin("Nil", 0, 0);
     }
@@ -180,7 +180,7 @@ private:
                 throw errorAt(at(rule.line), "`Rep` rules are built in", "Rep clones whatever it faces");
             } else if (side == breed::Ghost) {
                 throw errorAt(at(rule.line), "`Ghost` rules are built in", "Ghost erases whatever it faces");
-            } else if (side == breed::Say || side == breed::Read || side == breed::World) {
+            } else if (side == breed::Say || side == breed::Hear || side == breed::World) {
                 throw errorAt(at(rule.line), "`" + breedName(side) + "` only faces the World", "it can't have rules");
             }
         }

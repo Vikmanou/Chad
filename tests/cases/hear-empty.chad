@@ -1,0 +1,7 @@
+ngl no input: HearNum gives Silence
+First(w, next) vs Silence => "none\n" ~ Print(w, next)
+First(w, next) vs n       => n ~ Show(w, next)
+
+main
+  world ~ Hear(w, HearNum(w, w2, n))
+  n ~ First(w2, Ghost)

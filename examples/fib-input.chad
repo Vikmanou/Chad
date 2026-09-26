@@ -4,5 +4,5 @@ Step[a, b](r) vs n
   else      => n - 1 ~ Step[b, a + b](r)
 
 main
-  world ~ Read(w, Num(w, w2, n))
+  world ~ Hear(w, HearNum(w, w2, n))
   n ~ Step[0, 1](Show(w2, Say['\n'](Ghost)))
