@@ -13,7 +13,6 @@
 #include "chad/lang/program.h"
 #include "cli.h"
 
-
 namespace {
 // take a wild guess who is responsible for this... Windows.
 void useBinaryStreams() {
