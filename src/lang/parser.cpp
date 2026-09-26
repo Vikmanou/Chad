@@ -127,6 +127,7 @@ private:
     }
 
     // Left vs Right => connections
+    // Left vs Right, then lines of `if condition => connections` and maybe a last `else => connections`
     void parseRule() {
         Rule rule;
         rule.line = peek().line;
@@ -135,13 +136,44 @@ private:
         ++pos;
         rule.right = parsePattern();
 
-        expectSymbol("=>");
-        Case single;
-        single.line = rule.line;
-        skipNewlines();
-        single.connections = parseConnections();
-        expectLineEnd();
-        rule.cases.push_back(std::move(single));
+        if (!isSymbol("=>")) {
+            expectLineEnd();
+            skipNewlines();
+        }
+
+        if (acceptSymbol("=>")) {
+            Case single;
+            single.line = rule.line;
+            skipNewlines();
+            single.connections = parseConnections();
+            expectLineEnd();
+            rule.cases.push_back(std::move(single));
+            source.rules.push_back(std::move(rule));
+            return;
+        }
+
+        if (!isWord("if") && !isWord("else")) fail("`=>` or an `if` case");
+
+        while (isWord("if") || isWord("else")) {
+            Case branch;
+            branch.line = peek().line;
+            const bool isElse = isWord("else");
+            ++pos;
+
+            if (!isElse) {
+                branch.hasCondition = true;
+                branch.condition = parseExpr();
+            }
+            expectSymbol("=>");
+            skipNewlines();
+            branch.connections = parseConnections();
+            expectLineEnd();
+            rule.cases.push_back(std::move(branch));
+            skipNewlines();
+
+            if (isElse) break;
+        }
+
         source.rules.push_back(std::move(rule));
     }
 
