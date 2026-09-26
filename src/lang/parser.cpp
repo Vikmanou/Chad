@@ -40,7 +40,11 @@ public:
 
     Source run() {
         skipNewlines();
-        if (!atEnd()) fail("a rule or `main`");
+        while (!atEnd()) {
+            if (!isWord("main")) fail("`main`");
+            parseMain();
+            skipNewlines();
+        }
         return std::move(source);
     }
 
@@ -85,9 +89,38 @@ private:
         }
     }
 
+    void expectLineEnd() const {
+        if (peek().kind != TokenKind::Newline && !atEnd()) fail("the end of the line");
+    }
+
+    bool lineHasVs() const {
+        for (std::size_t i = pos; tokens[i].kind != TokenKind::Newline && tokens[i].kind != TokenKind::End; ++i) {
+            if (tokens[i].kind == TokenKind::Name && tokens[i].text == "vs") return true;
+        }
+        return false;
+    }
+
     std::string takeName(const std::string& wanted) {
         if (peek().kind != TokenKind::Name || isKeyword(peek().text)) fail(wanted);
         return tokens[pos++].text;
+    }
+
+    // main, then one or more lines of connections, until a rule starts
+    void parseMain() {
+        const int line = peek().line;
+        ++pos;
+        source.hasMain = true;
+        source.mainLine = line;
+
+        while (true) {
+            skipNewlines();
+            if (atEnd() || isWord("main") || lineHasVs()) break;
+
+            for (Connection& connection : parseConnections()) {
+                source.main.push_back(std::move(connection));
+            }
+            expectLineEnd();
+        }
     }
 
     // a ~ b, c ~ d
