@@ -1,7 +1,10 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
+
+#include "chad/lang/ast.h"
 
 namespace chad {
 
@@ -26,6 +29,22 @@ struct BreedInfo {
     int valueCount = 0;
     int armCount = 0;
     int line = 0; // where it was first seen. 0 for built-ins
+};
+
+// a value to compute when a rule fires
+struct Code {
+    enum class Kind {
+        Constant,
+        Slot,
+        Unary,
+        Binary
+    };
+    Kind kind = Kind::Constant;
+    std::int64_t constant = 0;
+    int slot = 0; // which of the facing Chads' values
+    Operator op = Operator::Add;
+    std::vector<Code> operands;
+    int line = 0;
 };
 
 struct Program {
