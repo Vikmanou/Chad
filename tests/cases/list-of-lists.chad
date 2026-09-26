@@ -1,0 +1,5 @@
+PrintAll(w, next) vs Nil        => next ~ w
+PrintAll(w, next) vs Cons(s, t) => s ~ Print(w, Say['\n'](w2)), t ~ PrintAll(w2, next)
+
+main
+  Cons("ab", Cons("cd", Nil)) ~ PrintAll(world, Ghost)

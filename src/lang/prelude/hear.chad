@@ -14,4 +14,5 @@ Acc[a, sign](w, next, out) vs c
   else                     => next ~ w, out ~ a * sign
 
 Ask(w, next, out) vs Nil        => Hear(w2, HearNum(w2, next, out)) ~ w
-Ask(w, next, out) vs Cons[c](s) => Say[c](w2) ~ w, s ~ Ask(w2, next, out)
+Ask(w, next, out) vs Cons(c, s) => c ~ AskHead(w, next, out, s)
+AskHead(w, next, out, s) vs c   => Say[c](w2) ~ w, s ~ Ask(w2, next, out)

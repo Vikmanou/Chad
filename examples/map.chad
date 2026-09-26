@@ -1,13 +1,12 @@
 ngl Rep clones the function for each call
 Map(f, r) vs Nil        => f ~ Ghost, r ~ Nil
-Map(f, r) vs Cons[x](s) => f ~ Rep(f1, f2), f1 ~ Fn(x, y), y ~ Link(r, rest), s ~ Map(f2, rest)
-Link(r, rest) vs n      => r ~ Cons[n](rest)
+Map(f, r) vs Cons(x, s) => f ~ Rep(f1, f2), f1 ~ Fn(x, y), r ~ Cons(y, rest), s ~ Map(f2, rest)
 
-ShowAll(w, next) vs Nil          => next ~ w
-ShowAll(w, next) vs Cons[x](s)   => x ~ Show(w, w2), s ~ ShowMore(w2, next)
-ShowMore(w, next) vs Nil         => next ~ w
-ShowMore(w, next) vs Cons[x](s)  => Say[' '](w2) ~ w, x ~ Show(w2, w3), s ~ ShowMore(w3, next)
+ShowAll(w, next) vs Nil         => next ~ w
+ShowAll(w, next) vs Cons(x, s)  => x ~ Show(w, w2), s ~ ShowMore(w2, next)
+ShowMore(w, next) vs Nil        => next ~ w
+ShowMore(w, next) vs Cons(x, s) => Say[' '](w2) ~ w, x ~ Show(w2, w3), s ~ ShowMore(w3, next)
 
 main
-  Cons[1](Cons[2](Cons[3](Nil))) ~ Map(Fn(Mul(2, r), r), doubled)
+  Cons(1, Cons(2, Cons(3, Nil))) ~ Map(Fn(Mul(2, r), r), doubled)
   doubled ~ ShowAll(world, Say['\n'](Ghost))

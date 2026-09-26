@@ -39,7 +39,7 @@ public:
         addBuiltin("Say", 1, 1);
         addBuiltin("Hear", 0, 2);
         addBuiltin("Silence", 0, 0);
-        addBuiltin("Cons", 1, 1);
+        addBuiltin("Cons", 0, 2);
         addBuiltin("Nil", 0, 0);
     }
 
@@ -364,14 +364,13 @@ private:
             Code code;
             code.constant = c;
             code.line = compiler.at(term.line);
-            std::vector<Code> values;
-            values.push_back(std::move(code));
 
-            const std::size_t cons = newChad(breed::Cons, std::move(values), term.line);
+            const std::size_t cons = newChad(breed::Cons, {}, term.line);
+            result.links.push_back({End{false, cons, 1}, face(numberChad(std::move(code), term.line))});
             if (empty) {
                 first = cons;
             } else {
-                result.links.push_back({End{false, previous, 1}, face(cons)});
+                result.links.push_back({End{false, previous, 2}, face(cons)});
             }
             previous = cons;
             empty = false;
@@ -380,7 +379,7 @@ private:
         const std::size_t nil = newChad(breed::Nil, {}, term.line);
         if (empty) return face(nil);
 
-        result.links.push_back({End{false, previous, 1}, face(nil)});
+        result.links.push_back({End{false, previous, 2}, face(nil)});
         return face(first);
     }
 

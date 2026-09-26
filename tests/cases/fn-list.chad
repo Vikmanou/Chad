@@ -1,0 +1,5 @@
+Apply(w, next) vs Nil        => next ~ w
+Apply(w, next) vs Cons(f, s) => f ~ Fn(5, r), r ~ Show(w, Say['\n'](w2)), s ~ Apply(w2, next)
+
+main
+  Cons(Fn(Add(1, a), a), Cons(Fn(Mul(2, b), b), Nil)) ~ Apply(world, Ghost)

@@ -31,7 +31,7 @@ A program is a net of Chads connected by wires. Each Chad has one face and some 
 - `main` is the net the program starts with. `world` is the wire to the World, and it must be used exactly once.
 - `ngl` starts a comment until the end of the line.
 
-Values are 64-bit integers. They support `+ - * / %`, `== != < <= > >=` and `and`, `or`, `not`. `'a'` is the character's number. `"hi"` is `Cons['h'](Cons['i'](Nil))`.
+Values are 64-bit integers. They support `+ - * / %`, `== != < <= > >=` and `and`, `or`, `not`. `'a'` is the character's number. `"hi"` is `Cons('h', Cons('i', Nil))`.
 
 ## Built-in breeds
 
@@ -42,7 +42,7 @@ Values are 64-bit integers. They support `+ - * / %`, `== != < <= > >=` and `and
 | `Ghost` | erases whatever it meets |
 | `Rep(a, b)` | copies whatever it meets into `a` and `b` |
 | `Fn(in, out)` | a function. Two `Fn`s meeting join their arms |
-| `Cons[x](rest)`, `Nil` | lists |
+| `Cons(head, rest)`, `Nil` | lists. The head can be any Chad |
 | `Silence` | end of input |
 
 ## Prelude

@@ -1,3 +1,4 @@
 ngl say each character of a string
 Print(w, next) vs Nil        => next ~ w
-Print(w, next) vs Cons[c](s) => Say[c](w2) ~ w, s ~ Print(w2, next)
+Print(w, next) vs Cons(c, s) => c ~ PrintHead(w, next, s)
+PrintHead(w, next, s) vs c   => Say[c](w2) ~ w, s ~ Print(w2, next)
