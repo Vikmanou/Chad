@@ -90,9 +90,28 @@ private:
         return tokens[pos++].text;
     }
 
-    // lowest to highest: + -, * / %, unary -
+    // lowest to highest: comparisons, + -, * / %, unary -
     Expr parseExpr() {
-        return parseSum();
+        return parseComparison();
+    }
+
+    Expr parseComparison() {
+        Expr left = parseSum();
+        const std::pair<const char*, Operator> comparisons[] = {
+            {"==", Operator::Eq},
+            {"!=", Operator::Ne},
+            {"<", Operator::Lt},
+            {">", Operator::Gt},
+            {"<=", Operator::Le},
+            {">=", Operator::Ge},
+        };
+        for (const auto& [symbol, op] : comparisons) {
+            if (isSymbol(symbol)) {
+                const int line = tokens[pos++].line;
+                return binary(op, std::move(left), parseSum(), line);
+            }
+        }
+        return left;
     }
 
     Expr parseSum() {
