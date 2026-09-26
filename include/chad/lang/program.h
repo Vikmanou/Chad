@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "chad/compiler/instruction.h"
+#include "chad/lang/instruction.h"
 
 namespace chad {
 

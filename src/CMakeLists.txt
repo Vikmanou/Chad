@@ -2,9 +2,9 @@ add_library(chad_core
     core/error.cpp
     core/file.cpp
     core/text.cpp
-    compiler/instruction.cpp
-    compiler/lexer.cpp
-    compiler/program.cpp
+    lang/instruction.cpp
+    lang/lexer.cpp
+    lang/program.cpp
     runtime/interpreter.cpp
     runtime/io.cpp
     runtime/utf8.cpp

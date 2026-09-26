@@ -1,4 +1,4 @@
-#include "chad/compiler/lexer.h"
+#include "chad/lang/lexer.h"
 
 #include <cstdint>
 #include <optional>
@@ -6,7 +6,7 @@
 
 #include "chad/core/error.h"
 #include "chad/core/text.h"
-#include "chad/compiler/token.h"
+#include "chad/lang/token.h"
 
 namespace chad {
 
@@ -14,11 +14,11 @@ namespace chad {
 namespace {
 
 const std::string COMMENT_WORD = "ngl";
-const std::string UTF8_BOM = "\xEF\xBB\xBF"; // some editors (notepad) put these bytes to mark UTF-8
+const std::string UTF8_BOM =
+    "\xEF\xBB\xBF"; // some editors (notepad) put these bytes to mark UTF-8
 
 bool startsAsNumber(const std::string& lexeme) {
-    if (isDigit(lexeme[0]))
-        return true;
+    if (isDigit(lexeme[0])) return true;
     return lexeme[0] == '-' && lexeme.size() > 1 && isDigit(lexeme[1]);
 }
 
@@ -60,7 +60,8 @@ Token classify(const std::string& lexeme, int line) {
     if (startsAsNumber(lexeme)) {
         const std::optional<std::int64_t> value = parseInteger(lexeme);
         if (!value) {
-            throw errorAt(line, "unknown word `" + lexeme + "`", "not a number; tokens need spaces around them");
+            throw errorAt(line, "unknown word `" + lexeme + "`",
+                          "not a number; tokens need spaces around them");
         }
         token.kind = TokenKind::Number;
         token.value = *value;
@@ -76,7 +77,9 @@ Token classify(const std::string& lexeme, int line) {
 TokenList lex(const std::string& source) {
     TokenList tokens;
 
-    int idx = (source.compare(0, UTF8_BOM.size(), UTF8_BOM) == 0) ? UTF8_BOM.size() : 0;
+    int idx = (source.compare(0, UTF8_BOM.size(), UTF8_BOM) == 0)
+                  ? UTF8_BOM.size()
+                  : 0;
 
     int line = 1;
 
