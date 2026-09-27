@@ -12,6 +12,7 @@
 #include "chad/lang/compile.h"
 #include "chad/lang/lexer.h"
 #include "chad/lang/program.h"
+#include "chad/net/engine.h"
 #include "cli.h"
 
 namespace {
@@ -48,11 +49,7 @@ int main(int argc, char** argv) {
 
     try {
         const chad::Program program = chad::compile(*source);
-        std::cout << "NOT IMPLEMENTED" << std::endl;
-        for (const auto& token : chad::lex(*source)) {
-            std::cout << token.text << std::endl;
-        }
-        // chad::run(program);
+        chad::run(program);
     } catch (const chad::Error& error) {
         std::fflush(stdout);
         std::cerr << error.what() << "\n";
