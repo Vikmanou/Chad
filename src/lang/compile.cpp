@@ -152,6 +152,7 @@ private:
             if (name == "_") {
                 throw errorAt(at(pattern.line), "an arm can't be `_`", "every wire needs two ends; to drop something, wire it to `Ghost`");
             }
+            if (name == "world") throw errorAt(at(pattern.line), "`world` is only in main", "pass the World along through arms, like `Print(w, next)`");
             scope.outside.emplace(name, scope.outsideCount++);
         }
     }
@@ -203,6 +204,10 @@ public:
         return std::move(result);
     }
 
+    bool usedWorld() const {
+        return hasWorld;
+    }
+
 private:
     struct Wire {
         std::string name;
@@ -223,6 +228,8 @@ private:
     Template result;
     std::vector<Wire> wires;
     std::map<std::string, std::size_t> wireIds;
+    bool hasWorld = false;
+    std::size_t worldWire = 0;
 
     std::size_t wireFor(const std::string& name) {
         const auto [found, isNew] = wireIds.emplace(name, wires.size());
@@ -304,6 +311,16 @@ private:
             code.slot = value->second;
             code.line = compiler.at(term.line);
             return endPlaced(face(numberChad(std::move(code), term.line)));
+        }
+
+        if (name == "world") {
+            if (!scope.inMain) throw errorAt(compiler.at(term.line), "`world` is only in main", "pass the World along through arms, like `Print(w, next)`");
+
+            if (!hasWorld) {
+                hasWorld = true;
+                worldWire = wireFor(name);
+                attach(worldWire, End{true, 0, 0}, term.line);
+            }
         }
 
         return wirePlaced(wireFor(name));
@@ -388,9 +405,12 @@ private:
     }
 
     void finishWires() {
-        for (const Wire& wire : wires) {
+        for (std::size_t i = 0; i < wires.size(); i++) {
+            const Wire& wire = wires[i];
             const std::size_t count = wire.uses.size();
             if (count == 2) continue;
+
+            if (hasWorld && i == worldWire) throw errorAt(compiler.at(wire.uses[2]), "`world` used twice", "main holds one end of the World's wire");
 
             if (count == 1 && wire.fromHead) throw errorAt(compiler.at(wire.uses[0]), "loose wire `" + wire.name + "`", "it comes from the rule head but is never connected");
             if (count == 1) throw errorAt(compiler.at(wire.uses[0]), "loose wire `" + wire.name + "`", "it has one end; every wire needs two");
@@ -450,7 +470,9 @@ void Compiler::addMain(const ast::Source& source) {
 
     Scope scope;
     scope.inMain = true;
-    program.main = TemplateBuilder(*this, scope, source.mainLine).build(source.main);
+    TemplateBuilder builder(*this, scope, source.mainLine);
+    program.main = builder.build(source.main);
+    program.usesWorld = builder.usedWorld();
     program.mainLine = source.mainLine;
 }
 }
