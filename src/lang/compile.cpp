@@ -11,6 +11,7 @@
 #include "chad/lang/ast.h"
 #include "chad/lang/lexer.h"
 #include "chad/lang/parser.h"
+#include "prelude.h"
 
 namespace chad {
 
@@ -483,6 +484,7 @@ void Compiler::addMain(const ast::Source& source) {
 
 Program compile(const std::string& source) {
     Compiler compiler;
+    compiler.addRules(parse(lex(PRELUDE_SOURCE)), true);
 
     const ast::Source program = parse(lex(source));
 

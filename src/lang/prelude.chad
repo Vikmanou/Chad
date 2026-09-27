@@ -1,0 +1,3 @@
+ngl Print: say each character of a string
+Print(w, next) vs Nil        => next ~ w
+Print(w, next) vs Cons[c](s) => Say[c](w2) ~ w, s ~ Print(w2, next)

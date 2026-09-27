@@ -1,0 +1,4 @@
+Print(a) vs Nil => a ~ Ghost
+
+main
+  Ghost ~ Ghost
