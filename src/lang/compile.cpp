@@ -41,11 +41,7 @@ public:
 
     void addRules(const ast::Source& source) {
         for (const ast::Rule& rule : source.rules) {
-            patternBreed(rule.left);
-            patternBreed(rule.right);
-            for (const ast::Case& branch : rule.cases) {
-                addConnections(branch.connections);
-            }
+            addRule(rule);
         }
     }
 
@@ -140,6 +136,35 @@ private:
     Breed patternBreed(const ast::Pattern& pattern) {
         if (pattern.isNumber) return breed::Number;
         return breedFor(pattern.breed, pattern.values.size(), pattern.arms.size(), pattern.line);
+    }
+
+    void bind(const ast::Pattern& pattern, Scope& scope) const {
+        for (const std::string& name : pattern.values) {
+            if (name != "_") {
+                scope.values.emplace(name, scope.valueCount);
+            }
+            scope.valueCount++;
+        }
+
+        for (const std::string& name : pattern.arms) {
+            if (name == "_") {
+                throw errorAt(at(pattern.line), "an arm can't be `_`", "every wire needs two ends; to drop something, wire it to `Ghost`");
+            }
+            scope.outside.emplace(name, scope.outsideCount++);
+        }
+    }
+
+    void addRule(const ast::Rule& rule) {
+        patternBreed(rule.left);
+        patternBreed(rule.right);
+
+        Scope scope;
+        bind(rule.left, scope);
+        bind(rule.right, scope);
+
+        for (const ast::Case& branch : rule.cases) {
+            addConnections(branch.connections);
+        }
     }
 
     void addTerm(const ast::Term& term) {
