@@ -47,6 +47,9 @@ public:
     }
 
     void addMain(const ast::Source& source) {
+        if (!source.hasMain) {
+            throw errorAt(1, "no `main`", "a program starts from its `main` block");
+        }
         addConnections(source.main);
     }
 
