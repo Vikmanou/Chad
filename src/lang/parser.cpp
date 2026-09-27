@@ -113,7 +113,7 @@ private:
         return tokens[pos++].text;
     }
 
-    // main until a rule starts
+    // main until the end of the file
     void parseMain() {
         const int line = peek().line;
 
@@ -127,7 +127,8 @@ private:
         while (true) {
             skipNewlines();
 
-            if (atEnd() || isWord("main") || lineHasVs()) break;
+            if (atEnd() || isWord("main")) break;
+            if (lineHasVs()) throw errorAt(peek().line, "rule after `main`", "rules go before `main`, which runs to the end of the file");
 
             for (Connection& connection : parseConnections()) {
                 source.main.push_back(std::move(connection));

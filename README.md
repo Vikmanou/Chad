@@ -28,7 +28,7 @@ A program is a net of Chads connected by wires. Each Chad has one face and some 
 - A number like `42` is a Chad too. A name like `w` is a wire.
 - `A(x) vs B(y) => ...` is the rule for when `A` meets `B`. `A(x) vs n` matches any number `n`.
 - A rule can have cases: `if cond => ...` and a final `else => ...`. The first case that fits is used.
-- `main` is the net the program starts with. `world` is the wire to the World, and it must be used exactly once.
+- `main` is the net the program starts with. It comes after the rules and runs to the end of the file. `world` is the wire to the World, and it must be used exactly once.
 - `ngl` starts a comment until the end of the line.
 
 Values are 64-bit integers. They support `+ - * / %`, `== != < <= > >=` and `and`, `or`, `not`. `'a'` is the character's number. `"hi"` is `Cons('h', Cons('i', Nil))`.

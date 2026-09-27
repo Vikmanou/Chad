@@ -1,0 +1,4 @@
+main
+  1 ~ Foo(Ghost)
+
+Foo(r) vs n => r ~ n
