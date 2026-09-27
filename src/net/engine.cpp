@@ -283,14 +283,14 @@ private:
     void meetWorld(std::size_t chad, std::size_t world) {
         if (net[chad].breed == breed::Say) return say(chad, world);
         if (net[chad].breed == breed::Hear) return hear(chad, world);
-        if (net[chad].breed == breed::Rep) throw errorAt(net[chad].line, "can't clone the world", "a `Rep` faced the World");
+        if (net[chad].breed == breed::Rep) throw errorAt(net[chad].line, "can't copy the World", "a `Rep` met the World");
 
-        throw errorAt(net[chad].line, describe(chad) + " faced the World", "only `Say` and `Hear` can");
+        throw errorAt(net[chad].line, describe(chad) + " met the World", "only `Say` and `Hear` can");
     }
 
     void say(std::size_t chad, std::size_t world) {
         const std::int64_t c = net[chad].values[0];
-        if (!utf8::isValidChar(c)) throw errorAt(net[chad].line, "not a char", "`Say` got " + std::to_string(c));
+        if (!utf8::isValidChar(c)) throw errorAt(net[chad].line, "not a character", "`Say` got " + std::to_string(c));
 
         writeBytes(utf8::encode(c));
 

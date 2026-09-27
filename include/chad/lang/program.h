@@ -43,7 +43,7 @@ struct Code {
     };
     Kind kind = Kind::Constant;
     std::int64_t constant = 0;
-    std::size_t slot = 0; // which of the facing Chads' values
+    std::size_t slot = 0; // which of the meeting Chads' values
     Operator op = Operator::Add;
     std::vector<Code> operands;
     int line = 0;
@@ -62,7 +62,7 @@ struct NewChad {
     int line = 0;
 };
 
-// face off result
+// what a face-off turns into
 struct Template {
     std::vector<NewChad> chads;
     std::vector<std::pair<End, End>> links;

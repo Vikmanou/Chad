@@ -80,7 +80,7 @@ public:
     // every use of a breed must have the same number of values and arms as the first one
     Breed breedFor(const std::string& name, std::size_t valueCount, std::size_t armCount, int line) {
         line = at(line);
-        if (name == "World") throw errorAt(line, "`World` belongs to the runtime", "your program gets it through the `world` wire in main");
+        if (name == "World") throw errorAt(line, "`World` belongs to the runtime", "your program gets it through the `world` wire in `main`");
 
         const auto found = breedIds.find(name);
         if (found == breedIds.end()) {
@@ -165,7 +165,7 @@ private:
             if (name == "_") {
                 throw errorAt(at(pattern.line), "an arm can't be `_`", "every wire needs two ends; to drop something, wire it to `Ghost`");
             }
-            if (name == "world") throw errorAt(at(pattern.line), "`world` is only in main", "pass the World along through arms, like `Print(w, next)`");
+            if (name == "world") throw errorAt(at(pattern.line), "`world` only exists in `main`", "pass the World along through arms, like `Print(w, next)`");
             scope.outside.emplace(name, scope.outsideCount++);
         }
     }
@@ -177,16 +177,16 @@ private:
     void checkPair(const ast::Rule& rule, Breed left, Breed right) const {
         for (const Breed side : {left, right}) {
             if (side == breed::Rep) {
-                throw errorAt(at(rule.line), "`Rep` rules are built in", "Rep clones whatever it faces");
+                throw errorAt(at(rule.line), "`Rep` rules are built in", "`Rep` copies whatever it meets");
             } else if (side == breed::Ghost) {
-                throw errorAt(at(rule.line), "`Ghost` rules are built in", "Ghost erases whatever it faces");
+                throw errorAt(at(rule.line), "`Ghost` rules are built in", "`Ghost` erases whatever it meets");
             } else if (side == breed::Say || side == breed::Hear || side == breed::World) {
-                throw errorAt(at(rule.line), "`" + breedName(side) + "` only faces the World", "it can't have rules");
+                throw errorAt(at(rule.line), "`" + breedName(side) + "` only meets the World", "it can't have rules");
             }
         }
 
         if (left == breed::Number && right == breed::Number) {
-            throw errorAt(at(rule.line), "a rule needs a breed", "two numbers facing off can't have a rule");
+            throw errorAt(at(rule.line), "a rule needs a breed", "two numbers can't meet");
         } else if (left == breed::Fn && right == breed::Fn) {
             throw errorAt(at(rule.line), "`Fn vs Fn` is built in", "two `Fn`s meet and join their arms");
         } else if (left == right) {
@@ -327,7 +327,7 @@ private:
         }
 
         if (name == "world") {
-            if (!scope.inMain) throw errorAt(compiler.at(term.line), "`world` is only in main", "pass the World along through arms, like `Print(w, next)`");
+            if (!scope.inMain) throw errorAt(compiler.at(term.line), "`world` only exists in `main`", "pass the World along through arms, like `Print(w, next)`");
 
             if (!hasWorld) {
                 hasWorld = true;
@@ -427,7 +427,7 @@ private:
             const std::size_t count = wire.uses.size();
             if (count == 2) continue;
 
-            if (hasWorld && i == worldWire) throw errorAt(compiler.at(wire.uses[2]), "`world` used twice", "main holds one end of the World's wire");
+            if (hasWorld && i == worldWire) throw errorAt(compiler.at(wire.uses[2]), "`world` used twice", "`main` holds one end of the World's wire");
 
             if (count == 1 && wire.fromHead) throw errorAt(compiler.at(wire.uses[0]), "loose wire `" + wire.name + "`", "it comes from the rule head but is never connected");
             if (count == 1) throw errorAt(compiler.at(wire.uses[0]), "loose wire `" + wire.name + "`", "it has one end; every wire needs two");

@@ -35,13 +35,13 @@ int main(int argc, char** argv) {
             return 0;
         }
     } else {
-        std::cerr << "Error: " << parsed.error << std::endl;
+        std::cerr << parsed.error << std::endl;
         return 1;
     }
 
     const std::optional<std::string> source = chad::readFile(parsed.path);
     if (!source) {
-        std::cerr << "chad: cannot read `" << parsed.path << "`\n";
+        std::cerr << "can't read `" << parsed.path << "`\n";
         return 1;
     }
 

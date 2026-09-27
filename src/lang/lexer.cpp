@@ -135,7 +135,7 @@ private:
 
         const std::int64_t value = readChar("character");
         if (index >= source.size() || source[index] != '\'') {
-            throw errorAt(line, "unclosed character", "a character literal holds one character, like 'a'");
+            throw errorAt(line, "unclosed character", "a character literal holds one character, like `'a'`");
         }
         ++index;
 
