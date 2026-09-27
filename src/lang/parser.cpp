@@ -1,5 +1,6 @@
 #include "chad/lang/parser.h"
 
+#include <cstddef>
 #include <string>
 #include <utility>
 
@@ -57,7 +58,7 @@ public:
 private:
     const TokenList& tokens;
 
-    int pos = 0;
+    std::size_t pos = 0;
     Source source;
 
     const Token& peek() const {
@@ -101,7 +102,7 @@ private:
     }
 
     bool lineHasVs() const {
-        for (int i = pos; tokens[i].kind != TokenKind::Newline && tokens[i].kind != TokenKind::End; ++i) {
+        for (std::size_t i = pos; tokens[i].kind != TokenKind::Newline && tokens[i].kind != TokenKind::End; ++i) {
             if (tokens[i].kind == TokenKind::Name && tokens[i].text == "vs") return true;
         }
         return false;

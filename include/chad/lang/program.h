@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <utility>
@@ -9,7 +10,7 @@
 
 namespace chad {
 
-using Breed = int;
+using Breed = std::size_t;
 
 // the breeds every program has
 namespace breed {
@@ -27,8 +28,8 @@ constexpr Breed Nil = 9;
 
 struct BreedInfo {
     std::string name;
-    int valueCount = 0;
-    int armCount = 0;
+    std::size_t valueCount = 0;
+    std::size_t armCount = 0;
     int line = 0; // where it was first seen. 0 for built-ins
 };
 
@@ -42,7 +43,7 @@ struct Code {
     };
     Kind kind = Kind::Constant;
     std::int64_t constant = 0;
-    int slot = 0; // which of the facing Chads' values
+    std::size_t slot = 0; // which of the facing Chads' values
     Operator op = Operator::Add;
     std::vector<Code> operands;
     int line = 0;
@@ -51,8 +52,8 @@ struct Code {
 // one end of a wire in a template
 struct End {
     bool outside = false;
-    int index = 0; // which outside port or which new Chad
-    int slot = 0; // port of the new Chad: 0 is the face, 1 the arms
+    std::size_t index = 0; // which outside port or which new Chad
+    std::size_t slot = 0; // port of the new Chad: 0 is the face, 1 the arms
 };
 
 struct NewChad {
@@ -90,7 +91,7 @@ struct Program {
     int mainLine = 0;
 
     int findRule(Breed a, Breed b) const {
-        return ruleTable[static_cast<std::size_t>(a) * breeds.size() + static_cast<std::size_t>(b)];
+        return ruleTable[a * breeds.size() + b];
     }
 };
 

@@ -59,19 +59,18 @@ public:
 
         const auto found = breedIds.find(name);
         if (found == breedIds.end()) {
-            const Breed id = static_cast<Breed>(program.breeds.size());
-            program.breeds.push_back({name, static_cast<int>(valueCount), static_cast<int>(armCount), line});
+            const Breed id = program.breeds.size();
+            program.breeds.push_back({name, valueCount, armCount, line});
             breedIds.emplace(name, id);
             return id;
         }
 
         const BreedInfo& info = program.breeds[found->second];
-        if (info.valueCount != static_cast<int>(valueCount) || info.armCount != static_cast<int>(armCount)) {
+        if (info.valueCount != valueCount || info.armCount != armCount) {
             const std::string where = info.line == 0 ? "as a built-in" : "on " + lineName(info.line);
-            throw errorAt(line, "wrong shape for `" + name + "`",
-                          "it has " + shape(valueCount, armCount) + " here, but " +
-                              shape(info.valueCount, info.armCount) + " " + where);
+            throw errorAt(line, "wrong shape for `" + name + "`", "it has " + shape(valueCount, armCount) + " here, but " + shape(info.valueCount, info.armCount) + " " + where);
         }
+
         return found->second;
     }
 
@@ -79,9 +78,9 @@ private:
     Program program;
     std::map<std::string, Breed> breedIds;
 
-    void addBuiltin(const std::string& name, int valueCount, int armCount) {
+    void addBuiltin(const std::string& name, std::size_t valueCount, std::size_t armCount) {
         if (name != "number") {
-            breedIds.emplace(name, static_cast<Breed>(program.breeds.size()));
+            breedIds.emplace(name, program.breeds.size());
         }
         program.breeds.push_back({name, valueCount, armCount, 0});
     }
@@ -93,6 +92,7 @@ private:
 
     void addTerm(const ast::Term& term) {
         if (term.kind != ast::TermKind::Chad) return;
+
         breedFor(term.name, term.values.size(), term.arms.size(), term.line);
         for (const ast::Term& arm : term.arms) {
             addTerm(arm);
@@ -111,9 +111,12 @@ private:
 
 Program compile(const std::string& source) {
     Compiler compiler;
+
     const ast::Source program = parse(lex(source));
+
     compiler.addRules(program);
     compiler.addMain(program);
+
     return compiler.finish();
 }
 

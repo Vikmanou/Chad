@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -66,7 +67,7 @@ int main() {
         }
     }
 
-    int failed = 0;
+    std::size_t failed = 0;
     for (const fs::path& test : tests) {
         const std::string failure = check(test);
         if (!failure.empty()) {
