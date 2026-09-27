@@ -1,0 +1,7 @@
+ngl keep a running total until the input ends
+Sum[t](w, next) vs Eof => t ~ Show(w, next)
+Sum[t](w, next) vs n   => Read(w2, Num(w2, w3, m)) ~ w, m ~ Sum[t + n](w3, next)
+
+main
+  world ~ Read(w, Num(w, w2, n))
+  n ~ Sum[0](w2, Say['\n'](Ghost))
