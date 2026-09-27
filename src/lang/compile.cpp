@@ -57,11 +57,13 @@ public:
     Program finish() {
         const std::size_t count = program.breeds.size();
         program.ruleTable.assign(count * count, -1);
+
         for (std::size_t i = 0; i < program.rules.size(); i++) {
             const Rule& rule = program.rules[i];
             program.ruleTable[rule.left * count + rule.right] = static_cast<int>(i);
             program.ruleTable[rule.right * count + rule.left] = static_cast<int>(i);
         }
+
         return std::move(program);
     }
 
@@ -71,9 +73,7 @@ public:
 
     // every use of a breed must have the same number of values and arms as the first one
     Breed breedFor(const std::string& name, std::size_t valueCount, std::size_t armCount, int line) {
-        if (name == "World") {
-            throw errorAt(line, "`World` belongs to the runtime", "your program gets it through the `world` wire in main");
-        }
+        if (name == "World") throw errorAt(line, "`World` belongs to the runtime", "your program gets it through the `world` wire in main");
 
         const auto found = breedIds.find(name);
         if (found == breedIds.end()) {
@@ -191,9 +191,7 @@ private:
         checkPair(rule, left, right);
 
         const auto [found, isNew] = ruleLines.emplace(std::minmax(left, right), at(rule.line));
-        if (!isNew) {
-            throw errorAt(at(rule.line), "second rule for `" + breedName(left) + " vs " + breedName(right) + "`", "the first one is on " + lineName(found->second));
-        }
+        if (!isNew) throw errorAt(at(rule.line), "second rule for `" + breedName(left) + " vs " + breedName(right) + "`", "the first one is on " + lineName(found->second));
 
         Scope scope;
         bind(rule.left, scope);
