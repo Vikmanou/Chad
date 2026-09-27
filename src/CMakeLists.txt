@@ -1,7 +1,14 @@
-set(CHAD_PRELUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lang/prelude.chad)
-file(READ ${CHAD_PRELUDE_PATH} CHAD_PRELUDE)
+set(CHAD_PRELUDE_NAMES print show math)
+
+set(CHAD_PRELUDE_FILES "")
+foreach(name ${CHAD_PRELUDE_NAMES})
+    set(path ${CMAKE_CURRENT_SOURCE_DIR}/lang/prelude/${name}.chad)
+    file(READ ${path} source)
+    string(APPEND CHAD_PRELUDE_FILES "    {\"prelude/${name}.chad\", R\"chad_prelude(${source})chad_prelude\"},\n")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${path})
+endforeach()
+
 configure_file(lang/prelude.h.in ${CMAKE_CURRENT_BINARY_DIR}/generated/prelude.h @ONLY)
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CHAD_PRELUDE_PATH})
 
 add_library(chad_core
     core/error.cpp

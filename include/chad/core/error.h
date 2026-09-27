@@ -16,6 +16,8 @@ Error errorAt(int line, const std::string& kind, const std::string& detail = "")
 
 std::string lineName(int line);
 
+std::string preludeLineName(int line);
+
 std::string plural(std::size_t count, const char* word);
 
 std::string shape(std::size_t values, std::size_t arms);

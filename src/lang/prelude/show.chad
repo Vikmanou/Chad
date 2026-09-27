@@ -1,0 +1,7 @@
+ngl spell a number's digits, then Print them
+Show(w, next) vs n
+  if n < 0 => Say['-'](w2) ~ w, n ~ Spell(w2, next, Nil)
+  else     => 0 - n ~ Spell(w, next, Nil)
+Spell(w, next, s) vs n
+  if n > -10 => Cons['0' - n](s) ~ Print(w, next)
+  else       => n / 10 ~ Spell(w, next, Cons['0' - n % 10](s))

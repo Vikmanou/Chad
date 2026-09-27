@@ -1,5 +1,8 @@
 #include "chad/core/error.h"
 
+#include "chad/core/text.h"
+#include "prelude.h"
+
 namespace chad {
 
 Error errorAt(int line, const std::string& kind, const std::string& detail) {
@@ -11,9 +14,20 @@ Error errorAt(int line, const std::string& kind, const std::string& detail) {
 }
 
 std::string lineName(int line) {
-    if (line < 0) return "prelude line " + std::to_string(-line);
+    if (line < 0) return preludeLineName(-line);
 
     return "line " + std::to_string(line);
+}
+
+std::string preludeLineName(int line) {
+    for (const PreludeFile& file : PRELUDE_FILES) {
+        const int lines = countLines(file.source);
+        if (line <= lines) return std::string(file.name) + " line " + std::to_string(line);
+
+        line -= lines;
+    }
+
+    return "prelude line " + std::to_string(line);
 }
 
 std::string plural(std::size_t count, const char* word) {
