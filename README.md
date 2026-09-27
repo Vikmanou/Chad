@@ -26,9 +26,10 @@ A program is a net of Chads connected by wires. Each Chad has one face and some 
 - `A[1, 2](x)` also carries the values `1` and `2`.
 - `a ~ b` connects `a` and `b` with a wire.
 - A number like `42` is a Chad too. A name like `w` is a wire.
+- In a rule, names in `[ ]` and a matched number `n` are values and can be used any number of times. Names in `( )` are wires and have two ends.
 - `A(x) vs B(y) => ...` is the rule for when `A` meets `B`. `A(x) vs n` matches any number `n`.
 - A rule can have cases: `if cond => ...` and a final `else => ...`. The first case that fits is used.
-- `main` is the net the program starts with. It comes after the rules and runs to the end of the file. `world` is the wire to the World, and it must be used exactly once.
+- `main` is the net the program starts with. It comes after the rules and runs to the end of the file. `world` is the wire to the World, and it can be used once.
 - `ngl` starts a comment until the end of the line.
 
 Values are 64-bit integers. They support `+ - * / %`, `== != < <= > >=` and `and`, `or`, `not`. `'a'` is the character's number. `"hi"` is `Cons('h', Cons('i', Nil))`.
@@ -54,6 +55,7 @@ Every program includes these integrated Chad functionalities (directly written i
 | `Print(w, next)` | prints a string |
 | `Show(w, next)` | prints a number |
 | `HearNum(w, next, out)` | reads a number into `out` (`Silence` at the end) |
+| `Ask(w, next, out)` | prints a string, then reads a number into `out` |
 | `Add(b, out)`, `Sub`, `Mul`, `Div`, `Mod` | `a ~ Add(b, out)` puts `a + b` on `out` |
 | `Eq(b, out)`, `Lt`, `Gt` | same, but compares |
 
