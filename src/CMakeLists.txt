@@ -6,6 +6,7 @@ add_library(chad_core
     lang/parser.cpp
     lang/compile.cpp
     net/engine.cpp
+    net/expr.cpp
     net/net.cpp
     runtime/io.cpp
     runtime/utf8.cpp
