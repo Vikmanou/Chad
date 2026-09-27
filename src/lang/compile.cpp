@@ -1,5 +1,6 @@
 #include "chad/lang/compile.h"
 
+#include <algorithm>
 #include <map>
 #include <string>
 #include <utility>
@@ -56,6 +57,11 @@ public:
     Program finish() {
         const std::size_t count = program.breeds.size();
         program.ruleTable.assign(count * count, -1);
+        for (std::size_t i = 0; i < program.rules.size(); i++) {
+            const Rule& rule = program.rules[i];
+            program.ruleTable[rule.left * count + rule.right] = static_cast<int>(i);
+            program.ruleTable[rule.right * count + rule.left] = static_cast<int>(i);
+        }
         return std::move(program);
     }
 
@@ -184,16 +190,32 @@ private:
         const Breed right = patternBreed(rule.right);
         checkPair(rule, left, right);
 
+        const auto [found, isNew] = ruleLines.emplace(std::minmax(left, right), at(rule.line));
+        if (!isNew) {
+            throw errorAt(at(rule.line), "second rule for `" + breedName(left) + " vs " + breedName(right) + "`", "the first one is on " + lineName(found->second));
+        }
+
         Scope scope;
         bind(rule.left, scope);
         bind(rule.right, scope);
 
+        Rule compiled;
+        compiled.left = left;
+        compiled.right = right;
+        compiled.line = at(rule.line);
+
         for (const ast::Case& branch : rule.cases) {
+            RuleCase compiledCase;
+            compiledCase.line = at(branch.line);
             if (branch.hasCondition) {
-                compileExpr(branch.condition, scope);
+                compiledCase.hasCondition = true;
+                compiledCase.condition = compileExpr(branch.condition, scope);
             }
             addConnections(branch.connections, scope);
+            compiled.cases.push_back(std::move(compiledCase));
         }
+
+        program.rules.push_back(std::move(compiled));
     }
 
     void addTerm(const ast::Term& term, const Scope& scope) {
