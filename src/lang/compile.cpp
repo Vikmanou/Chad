@@ -155,9 +155,34 @@ private:
         }
     }
 
+    std::string breedName(Breed breed) const {
+        return program.breeds[breed].name;
+    }
+
+    void checkPair(const ast::Rule& rule, Breed left, Breed right) const {
+        for (const Breed side : {left, right}) {
+            if (side == breed::Rep) {
+                throw errorAt(at(rule.line), "`Rep` rules are built in", "Rep clones whatever it faces");
+            } else if (side == breed::Ghost) {
+                throw errorAt(at(rule.line), "`Ghost` rules are built in", "Ghost erases whatever it faces");
+            } else if (side == breed::Say || side == breed::Read || side == breed::World) {
+                throw errorAt(at(rule.line), "`" + breedName(side) + "` only faces the World", "it can't have rules");
+            }
+        }
+
+        if (left == breed::Number && right == breed::Number) {
+            throw errorAt(at(rule.line), "a rule needs a breed", "two numbers facing off can't have a rule");
+        } else if (left == breed::Chad && right == breed::Chad) {
+            throw errorAt(at(rule.line), "`Chad vs Chad` is built in", "two Chads cancel out and join arms");
+        } else if (left == right) {
+            throw errorAt(at(rule.line), "`" + breedName(left) + "` can't have a rule with itself", "both sides would be the same breed, so the result could depend on which one is which");
+        }
+    }
+
     void addRule(const ast::Rule& rule) {
-        patternBreed(rule.left);
-        patternBreed(rule.right);
+        const Breed left = patternBreed(rule.left);
+        const Breed right = patternBreed(rule.right);
+        checkPair(rule, left, right);
 
         Scope scope;
         bind(rule.left, scope);

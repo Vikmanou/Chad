@@ -1,0 +1,4 @@
+Foo(a) vs Foo(b) => a ~ b
+
+main
+  Foo(Ghost) ~ Foo(Ghost)
