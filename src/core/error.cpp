@@ -11,6 +11,8 @@ Error errorAt(int line, const std::string& kind, const std::string& detail) {
 }
 
 std::string lineName(int line) {
+    if (line < 0) return "prelude line " + std::to_string(-line);
+
     return "line " + std::to_string(line);
 }
 

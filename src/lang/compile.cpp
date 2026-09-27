@@ -41,7 +41,8 @@ public:
         addBuiltin("Nil", 0, 0);
     }
 
-    void addRules(const ast::Source& source) {
+    void addRules(const ast::Source& source, bool prelude) {
+        lineSign = prelude ? -1 : 1;
         for (const ast::Rule& rule : source.rules) {
             addRule(rule);
         }
@@ -68,6 +69,7 @@ public:
 
     // every use of a breed must have the same number of values and arms as the first one
     Breed breedFor(const std::string& name, std::size_t valueCount, std::size_t armCount, int line) {
+        line = at(line);
         if (name == "World") throw errorAt(line, "`World` belongs to the runtime", "your program gets it through the `world` wire in main");
 
         const auto found = breedIds.find(name);
@@ -466,6 +468,7 @@ void Compiler::addRule(const ast::Rule& rule) {
 }
 
 void Compiler::addMain(const ast::Source& source) {
+    lineSign = 1;
     if (!source.hasMain) throw errorAt(1, "no `main`", "a program starts from its `main` block");
 
     Scope scope;
@@ -483,7 +486,7 @@ Program compile(const std::string& source) {
 
     const ast::Source program = parse(lex(source));
 
-    compiler.addRules(program);
+    compiler.addRules(program, false);
     compiler.addMain(program);
 
     return compiler.finish();
