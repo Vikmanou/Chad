@@ -1,0 +1,6 @@
+Count(w, next) vs n
+  if n < 0 => next ~ w
+  else => w ~ Say['0' + n](w2), n - 1 ~ Count(w2, next)
+
+main
+  3 ~ Count(world, Ghost)
