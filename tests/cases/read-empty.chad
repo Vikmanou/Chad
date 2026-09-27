@@ -1,0 +1,5 @@
+First(w, next) vs Eof => Say['n'](Say['o'](next)) ~ w
+First(w, next) vs c   => Say[c](next) ~ w
+
+main
+  world ~ Read(w, First(w, Ghost))

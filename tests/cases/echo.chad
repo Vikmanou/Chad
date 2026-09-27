@@ -1,0 +1,5 @@
+Echo(w, next) vs Eof => next ~ w
+Echo(w, next) vs c   => Say[c](Read(w2, Echo(w2, next))) ~ w
+
+main
+  world ~ Read(w, Echo(w, Ghost))
