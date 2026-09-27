@@ -6,12 +6,23 @@
 #include <vector>
 
 #include "chad/core/error.h"
+#include "chad/lang/ast.h"
 #include "chad/lang/lexer.h"
 #include "chad/lang/parser.h"
 
 namespace chad {
 
 namespace {
+
+struct Scope {
+    std::map<std::string, int> values;
+    std::map<std::string, int> outside;
+
+    int valueCount = 0;
+    int outsideCount = 0;
+
+    bool inMain = false;
+};
 
 class Compiler {
 public:
@@ -51,6 +62,10 @@ public:
         return std::move(program);
     }
 
+    int at(int line) const {
+        return line * lineSign;
+    }
+
     // every use of a breed must have the same number of values and arms as the first one
     Breed breedFor(const std::string& name, std::size_t valueCount, std::size_t armCount, int line) {
         if (name == "World") {
@@ -74,9 +89,44 @@ public:
         return found->second;
     }
 
+    Code compilerExpr(const ast::Expr& expr, const Scope& scope) const {
+        Code code;
+        code.line = at(expr.line);
+
+        switch (expr.kind) {
+            case ast::ExprKind::Number:
+                return code;
+            case ast::ExprKind::Name: {
+                const auto value = scope.values.find(expr.name);
+                if (value != scope.values.end()) {
+                    code.kind = Code::Kind::Slot;
+                    code.slot = value->second;
+                    return code;
+                } else if (expr.name == '_') {
+                    throw errorAt(code.line, "`_` only works in rule heads");
+                } else if (scope.outside.count(expr.name) != 0 || expr.name == "world") {
+                    throw errorAt(code.line, "`" + expr.name + "` is a wire, not a value", "values are the names in `[ ]` or a number in the rule head");
+                }
+                throw errorAt(code.line, "unknown value `" + expr.name + "`");
+            }
+            case ast::ExprKind::Unary:
+            case ast::ExprKind::Binary:
+                code.kind = expr.kind == ast::ExprKind::Unary ? Code::Kind::Unary : Code::Kind::Binary;
+                code.op = expr.op;
+                for (const ast::Expr& operand : expr.operands) {
+                    code.operands.push_back(compilerExpr(operand, scope));
+                }
+                return code;
+        }
+
+        return code;
+    }
+
 private:
     Program program;
     std::map<std::string, Breed> breedIds;
+    std::map<std::pair<Breed, Breed>, int> ruleLines; // each pair of breeds
+    int lineSign = 1;
 
     void addBuiltin(const std::string& name, std::size_t valueCount, std::size_t armCount) {
         if (name != "number") {
@@ -119,5 +169,4 @@ Program compile(const std::string& source) {
 
     return compiler.finish();
 }
-
 }
