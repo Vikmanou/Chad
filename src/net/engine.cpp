@@ -10,6 +10,7 @@
 #include "chad/lang/program.h"
 #include "chad/net/net.h"
 #include "chad/runtime/io.h"
+#include "chad/runtime/utf8.h"
 
 namespace chad {
 
@@ -112,7 +113,45 @@ private:
     }
 
     void react(std::size_t a, std::size_t b) {
+        const Breed first = net[a].breed;
+        const Breed second = net[b].breed;
+
+        if (first == breed::Ghost) return erase(a, b);
+        if (second == breed::Ghost) return erase(b, a);
+        if (first == breed::World) return meetWorld(b, a);
+        if (second == breed::World) return meetWorld(a, b);
+
         throw errorAt(net[a].line, "no rule for " + describe(a) + " vs " + describe(b));
+    }
+
+    void erase(std::size_t ghost, std::size_t victim) {
+        const int line = net[ghost].line;
+        const std::vector<Port> ports = net[victim].ports;
+
+        net.remove(ghost);
+        net.remove(victim);
+
+        for (std::size_t slot = 1; slot < ports.size(); slot++) {
+            const std::size_t newGhost = net.add(breed::Ghost, 0, line);
+            net.link(Port{newGhost, 0}, ports[slot]);
+        }
+    }
+
+    void meetWorld(std::size_t chad, std::size_t world) {
+        if (net[chad].breed == breed::Say) return say(chad, world);
+
+        throw errorAt(net[chad].line, describe(chad) + " faced the World", "only `Say` and `Read` can");
+    }
+
+    void say(std::size_t chad, std::size_t world) {
+        const std::int64_t c = net[chad].values[0];
+        if (!utf8::isValidChar(c)) throw errorAt(net[chad].line, "not a char", "`Say` got " + std::to_string(c));
+
+        writeBytes(utf8::encode(c));
+
+        const Port next = net[chad].ports[1];
+        net.remove(chad);
+        net.link(Port{world, 0}, next);
     }
 };
 
