@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <utility>
 #include <vector>
 
 #include "chad/lang/program.h"
@@ -35,9 +36,12 @@ public:
         return nodes[node];
     }
 
+    void link(Port a, Port b);
+
 private:
     std::vector<Node> nodes;
     std::vector<std::size_t> freeNodes;
+    std::vector<std::pair<std::size_t, std::size_t>> faceOffs;
 };
 
 }
