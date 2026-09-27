@@ -470,6 +470,7 @@ void Compiler::addMain(const ast::Source& source) {
 
     Scope scope;
     scope.inMain = true;
+
     TemplateBuilder builder(*this, scope, source.mainLine);
     program.main = builder.build(source.main);
     program.usesWorld = builder.usedWorld();
