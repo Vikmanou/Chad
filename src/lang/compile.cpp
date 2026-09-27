@@ -412,8 +412,13 @@ private:
         } else if (right.isWire) {
             attach(right.wire, left.end, connection.line);
         } else {
+            if (isNumber(left.end) && isNumber(right.end)) throw errorAt(compiler.at(connection.line), "two numbers can't meet", "one side needs a breed");
             result.links.push_back({left.end, right.end});
         }
+    }
+
+    bool isNumber(End end) const {
+        return !end.outside && end.slot == 0 && result.chads[end.index].breed == breed::Number;
     }
 
     void finishWires() {
