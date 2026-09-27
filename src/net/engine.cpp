@@ -179,6 +179,8 @@ private:
         if (second == breed::Ghost) return erase(b, a);
         if (first == breed::World) return meetWorld(b, a);
         if (second == breed::World) return meetWorld(a, b);
+        if (first == breed::Rep) return commute(a, b);
+        if (second == breed::Rep) return commute(b, a);
         if (first == breed::Chad && second == breed::Chad) return annihilate(a, b);
 
         const int index = program.findRule(first, second);
@@ -226,6 +228,39 @@ private:
         rewire();
         net.remove(a);
         net.remove(b);
+    }
+
+    void commute(std::size_t rep, std::size_t other) {
+        collectOutside({rep, other});
+
+        const Breed kind = net[other].breed;
+        const std::size_t arms = net[other].ports.size() - 1;
+        const std::vector<std::int64_t> values = net[other].values;
+        const std::uint64_t otherLabel = net[other].label;
+        const std::uint64_t repLabel = net[rep].label;
+        const int otherLine = net[other].line;
+        const int repLine = net[rep].line;
+
+        std::size_t copies[2];
+        for (std::size_t k = 0; k < 2; k++) {
+            copies[k] = net.add(kind, arms, otherLine);
+            net[copies[k]].values = values;
+            net[copies[k]].label = otherLabel;
+            insides[k].port = Port{copies[k], 0};
+        }
+
+        for (std::size_t i = 0; i < arms; i++) {
+            const std::size_t split = net.add(breed::Rep, 2, repLine);
+            net[split].label = repLabel;
+            insides[2 + i].port = Port{split, 0};
+
+            net.link(Port{split, 1}, Port{copies[0], i + 1});
+            net.link(Port{split, 2}, Port{copies[1], i + 1});
+        }
+
+        rewire();
+        net.remove(rep);
+        net.remove(other);
     }
 
     void erase(std::size_t ghost, std::size_t victim) {
