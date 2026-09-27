@@ -1,0 +1,4 @@
+main
+  world ~ Rep(a, b)
+  a ~ Ghost
+  b ~ Ghost
