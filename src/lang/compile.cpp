@@ -58,6 +58,10 @@ public:
 
     // every use of a breed must have the same number of values and arms as the first one
     Breed breedFor(const std::string& name, std::size_t valueCount, std::size_t armCount, int line) {
+        if (name == "World") {
+            throw errorAt(line, "`World` belongs to the runtime", "your program gets it through the `world` wire in main");
+        }
+
         const auto found = breedIds.find(name);
         if (found == breedIds.end()) {
             const Breed id = static_cast<Breed>(program.breeds.size());
