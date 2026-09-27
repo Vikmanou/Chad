@@ -8,6 +8,7 @@ struct PreludeFile {
 };
 
 inline constexpr PreludeFile PRELUDE_FILES[] = {
-@CHAD_PRELUDE_FILES@};
+@CHAD_PRELUDE_FILES@
+};
 
 }
