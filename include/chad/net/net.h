@@ -38,10 +38,14 @@ public:
 
     void link(Port a, Port b);
 
+    bool nextFaceOff(std::pair<std::size_t, std::size_t>& faceOff);
+
 private:
     std::vector<Node> nodes;
     std::vector<std::size_t> freeNodes;
     std::vector<std::pair<std::size_t, std::size_t>> faceOffs;
+
+    bool facing(std::size_t a, std::size_t b) const;
 };
 
 }
