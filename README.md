@@ -34,6 +34,32 @@ A program is a net of Chads connected by wires. Each Chad has one face and some 
 
 Values are 64-bit integers. They support `+ - * / %`, `== != < <= > >=` and `and`, `or`, `not`. `'a'` is the character's number. `"hi"` is `Cons('h', Cons('i', Nil))`.
 
+## Theory
+
+Chad is based on Lafont's interaction nets. Here's a comparison:
+
+| Lafont | Chad |
+| --- | --- |
+| agent | Chad |
+| symbol | breed |
+| principal port | face |
+| auxiliary ports | arms |
+| active pair | two faces that meet |
+| interaction rule | `A(x) vs B(y) => ...` |
+| interface | the arms in a rule head |
+| initial net | `main` |
+| constructor γ | `Fn` |
+| duplicator δ | `Rep` |
+| eraser ε | `Ghost` |
+
+Chad keeps Lafont's rules:
+
+- Linearity: every wire has two ends and every arm in a rule head is used once.
+- Binary interaction: rules only fire when two faces meet.
+- No ambiguity: each pair of breeds has at most one rule.
+
+So the order Chads meet in never changes the result. `Fn`, `Rep` and `Ghost` are Lafont's core interaction combinators.
+
 ## Built-in breeds
 
 | Breed | Does |
