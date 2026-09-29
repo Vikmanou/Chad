@@ -1,9 +1,11 @@
 #pragma once
 
+#include <cstdint>
+
 #include "chad/lang/program.h"
 
 namespace chad {
 
-void run(const Program& program);
+std::uint64_t run(const Program& program);
 
 }

@@ -98,8 +98,9 @@ cmake --build build
 
 ```
 chad <file.chad>
-chad -v    print the version
-chad -h    print help
+chad -c <file.chad>    print the number of interactions at the end
+chad -v                print the version
+chad -h                print help
 ```
 
 ## Test

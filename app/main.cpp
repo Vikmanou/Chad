@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <iostream>
 #include <optional>
 #include <string>
@@ -49,7 +50,8 @@ int main(int argc, char** argv) {
 
     try {
         const chad::Program program = chad::compile(*source);
-        chad::run(program);
+        const std::uint64_t interactions = chad::run(program);
+        if (parsed.wantsCount) std::cerr << "interactions: " << interactions << "\n";
     } catch (const chad::Error& error) {
         chad::flushOutput();
         std::cerr << error.what() << "\n";

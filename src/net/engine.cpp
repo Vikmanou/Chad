@@ -29,15 +29,20 @@ class Engine {
 public:
     explicit Engine(const Program& program) : program(program) {}
 
-    void run() {
+    std::uint64_t run() {
         start();
+
+        std::uint64_t interactions = 0;
 
         std::pair<std::size_t, std::size_t> faceOff;
         while (net.nextFaceOff(faceOff)) {
             react(faceOff.first, faceOff.second);
+            interactions++;
         }
 
         flushOutput();
+
+        return interactions;
     }
 
 private:
@@ -315,8 +320,8 @@ private:
 
 }
 
-void run(const Program& program) {
-    Engine(program).run();
+std::uint64_t run(const Program& program) {
+    return Engine(program).run();
 }
 
 }

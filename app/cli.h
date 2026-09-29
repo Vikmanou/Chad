@@ -10,6 +10,7 @@ struct Options {
 
 struct Arguments {
     std::string path;
+    bool wantsCount = false;
     bool ok = true;
     std::string error;
     std::string out;

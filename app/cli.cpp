@@ -5,8 +5,9 @@ bool isOption(const std::string& argument) {
 }
 
 const char* usageText() {
-    return "usage: chad <file.chad>\n"
+    return "usage: chad [-c] <file.chad>\n"
            "\n"
+           "  -c, --count    print the number of interactions at the end\n"
            "  -v, --version  print the version\n"
            "  -h, --help     print this\n";
 }
@@ -38,6 +39,8 @@ Arguments parseArguments(int argc, char** argv) {
             return printing(versionText());
         } else if (arg == "-h" || arg == "--help") {
             return printing(usageText());
+        } else if (arg == "-c" || arg == "--count") {
+            parsed.wantsCount = true;
         } else if (isOption(arg)) {
             return failed("unknown option `" + arg + "` -- use -h for help");
         } else if (parsed.path.empty()) {
