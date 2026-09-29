@@ -15,28 +15,39 @@ const char* versionText() {
     return "chad " CHAD_VERSION;
 }
 
+Arguments printing(const std::string& text) {
+    Arguments parsed;
+    parsed.out = text;
+    return parsed;
+}
+
+Arguments failed(const std::string& error) {
+    Arguments parsed;
+    parsed.ok = false;
+    parsed.error = error;
+    return parsed;
+}
+
 Arguments parseArguments(int argc, char** argv) {
     Arguments parsed;
 
-    if (argc < 2) {
-        parsed.ok = false;
-        parsed.error = "no input file -- usage: chad <file.chad>";
-    } else if (argc == 2) {
-        const char* arg = argv[1];
-        if (std::string(arg) == "-v" || std::string(arg) == "--version") {
-            parsed.out = versionText();
-        } else if (std::string(arg) == "-h" || std::string(arg) == "--help") {
-            parsed.out = usageText();
+    for (int i = 1; i < argc; i++) {
+        const std::string arg = argv[i];
+
+        if (arg == "-v" || arg == "--version") {
+            return printing(versionText());
+        } else if (arg == "-h" || arg == "--help") {
+            return printing(usageText());
         } else if (isOption(arg)) {
-            parsed.ok = false;
-            parsed.error = "unknown option `" + std::string(arg) + "` -- use -h for help";
-        } else {
+            return failed("unknown option `" + arg + "` -- use -h for help");
+        } else if (parsed.path.empty()) {
             parsed.path = arg;
+        } else {
+            return failed("too many arguments -- usage: chad <file.chad>");
         }
-    } else {
-        parsed.ok = false;
-        parsed.error = "too many arguments -- usage: chad <file.chad>";
     }
+
+    if (parsed.path.empty()) return failed("no input file -- usage: chad <file.chad>");
 
     return parsed;
 }
