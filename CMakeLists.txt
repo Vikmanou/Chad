@@ -23,8 +23,16 @@ if(MINGW)
     target_link_options(chad_options INTERFACE -static-libstdc++ -static-libgcc)
 endif()
 
-add_subdirectory(src)
-add_subdirectory(app)
+option(CHAD_BUILD_APP "Build the chad command-line app" ON)
+option(CHAD_BUILD_TESTS "Build the tests (needs CHAD_BUILD_APP)" ON)
 
-enable_testing()
-add_subdirectory(tests)
+add_subdirectory(src)
+
+if(CHAD_BUILD_APP)
+    add_subdirectory(app)
+endif()
+
+if(CHAD_BUILD_TESTS AND CHAD_BUILD_APP)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
