@@ -5,6 +5,8 @@
 
 namespace chad {
 
-std::optional<std::int64_t> readCodePoint();
+class Io;
+
+std::optional<std::int64_t> readCodePoint(Io& io);
 
 }

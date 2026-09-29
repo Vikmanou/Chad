@@ -48,12 +48,14 @@ int main(int argc, char** argv) {
 
     useBinaryStreams();
 
+    chad::Io io;
+
     try {
         const chad::Program program = chad::compile(*source);
-        const std::uint64_t interactions = chad::run(program);
+        const std::uint64_t interactions = chad::run(program, io);
         if (parsed.wantsCount) std::cerr << "interactions: " << interactions << "\n";
     } catch (const chad::Error& error) {
-        chad::flushOutput();
+        io.flushOutput();
         std::cerr << error.what() << "\n";
         return 1;
     }

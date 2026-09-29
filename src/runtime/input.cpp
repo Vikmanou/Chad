@@ -8,8 +8,8 @@
 
 namespace chad {
 
-std::optional<std::int64_t> readCodePoint() {
-    const int firstByte = readByte();
+std::optional<std::int64_t> readCodePoint(Io& io) {
+    const int firstByte = io.readByte();
     if (firstByte < 0) return std::nullopt;
 
     const std::size_t byteCount = utf8::charByteCount(static_cast<unsigned char>(firstByte));
@@ -17,7 +17,7 @@ std::optional<std::int64_t> readCodePoint() {
 
     std::int64_t codePoint = utf8::firstByteBits(static_cast<unsigned char>(firstByte), byteCount);
     for (std::size_t i = 1; i < byteCount; ++i) {
-        const int nextByte = readByte();
+        const int nextByte = io.readByte();
         if (nextByte < 0 || !utf8::isContinuationByte(static_cast<unsigned char>(nextByte))) {
             return firstByte;
         }

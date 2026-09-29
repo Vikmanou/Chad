@@ -6,6 +6,8 @@
 
 namespace chad {
 
-std::uint64_t run(const Program& program);
+class Io;
+
+std::uint64_t run(const Program& program, Io& io);
 
 }

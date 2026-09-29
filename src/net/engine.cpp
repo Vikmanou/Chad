@@ -27,7 +27,7 @@ struct Inside {
 
 class Engine {
 public:
-    explicit Engine(const Program& program) : program(program) {}
+    Engine(const Program& program, Io& io) : program(program), io(io) {}
 
     std::uint64_t run() {
         start();
@@ -40,13 +40,14 @@ public:
             interactions++;
         }
 
-        flushOutput();
+        io.flushOutput();
 
         return interactions;
     }
 
 private:
     const Program& program;
+    Io& io;
     Net net;
 
     std::vector<Port> outsidePorts;
@@ -296,7 +297,7 @@ private:
         const std::int64_t c = net[chad].values[0];
         if (!utf8::isValidChar(c)) throw errorAt(net[chad].line, "not a character", "`Say` got " + std::to_string(c));
 
-        writeBytes(utf8::encode(c));
+        io.writeBytes(utf8::encode(c));
 
         const Port next = net[chad].ports[1];
         net.remove(chad);
@@ -304,7 +305,7 @@ private:
     }
 
     void hear(std::size_t chad, std::size_t world) {
-        const std::optional<std::int64_t> c = readCodePoint();
+        const std::optional<std::int64_t> c = readCodePoint(io);
 
         const std::size_t got = net.add(c ? breed::Number : breed::Silence, 0, net[chad].line);
         if (c) net[got].values.push_back(*c);
@@ -320,8 +321,8 @@ private:
 
 }
 
-std::uint64_t run(const Program& program) {
-    return Engine(program).run();
+std::uint64_t run(const Program& program, Io& io) {
+    return Engine(program, io).run();
 }
 
 }
