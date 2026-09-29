@@ -42,7 +42,6 @@ Values are 64-bit integers. They support `+ - * / %`, `== != < <= > >=` and `and
 | `Hear(next, out)` | when it meets the World, reads one UTF-8 character into `out` (`Silence` at the end) and gives the World to `next` |
 | `Ghost` | erases whatever it meets |
 | `Rep(a, b)` | copies whatever it meets into `a` and `b` |
-| `Fn(in, out)` | a function. Two `Fn`s meeting join their arms |
 | `Cons(head, rest)`, `Nil` | lists. The head can be any Chad |
 | `Silence` | end of input |
 
@@ -52,6 +51,7 @@ Every program includes these integrated Chad functionalities (directly written i
 
 | Breed | Does |
 | --- | --- |
+| `Fn(in, out)` | a function. Two `Fn`s meeting join their arms |
 | `Print(w, next)` | prints a string |
 | `Show(w, next)` | prints a number |
 | `HearNum(w, next, out)` | reads a number into `out` (`Silence` at the end) |

@@ -33,7 +33,6 @@ public:
     Compiler() {
         addBuiltin("number", 1, 0);
         addBuiltin("World", 0, 0);
-        addBuiltin("Fn", 0, 2);
         addBuiltin("Rep", 0, 2);
         addBuiltin("Ghost", 0, 0);
         addBuiltin("Say", 1, 1);
@@ -187,9 +186,7 @@ private:
 
         if (left == breed::Number && right == breed::Number) {
             throw errorAt(at(rule.line), "a rule needs a breed", "two numbers can't meet");
-        } else if (left == breed::Fn && right == breed::Fn) {
-            throw errorAt(at(rule.line), "`Fn vs Fn` is built in", "two `Fn`s meet and join their arms");
-        } else if (left == right) {
+        } else if (left == right && !inPrelude) {
             throw errorAt(at(rule.line), "`" + breedName(left) + "` can't have a rule with itself", "both sides would be the same breed, so the result could depend on which one is which");
         }
     }

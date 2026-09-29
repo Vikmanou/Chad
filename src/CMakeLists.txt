@@ -1,4 +1,4 @@
-set(CHAD_PRELUDE_NAMES print show math hear)
+set(CHAD_PRELUDE_NAMES fn print show math hear)
 
 set(CHAD_PRELUDE_FILES "")
 foreach(name ${CHAD_PRELUDE_NAMES})

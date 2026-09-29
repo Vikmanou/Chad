@@ -16,14 +16,13 @@ using Breed = std::size_t;
 namespace breed {
 constexpr Breed Number = 0;
 constexpr Breed World = 1;
-constexpr Breed Fn = 2;
-constexpr Breed Rep = 3;
-constexpr Breed Ghost = 4;
-constexpr Breed Say = 5;
-constexpr Breed Hear = 6;
-constexpr Breed Silence = 7;
-constexpr Breed Cons = 8;
-constexpr Breed Nil = 9;
+constexpr Breed Rep = 2;
+constexpr Breed Ghost = 3;
+constexpr Breed Say = 4;
+constexpr Breed Hear = 5;
+constexpr Breed Silence = 6;
+constexpr Breed Cons = 7;
+constexpr Breed Nil = 8;
 }
 
 struct BreedInfo {
