@@ -10,7 +10,9 @@ Error errorAt(int line, const std::string& kind, const std::string& detail) {
     if (!detail.empty()) {
         message += " -- " + detail;
     }
-    return Error(message);
+    Error error(message);
+    error.line = line;
+    return error;
 }
 
 std::string lineName(int line) {
