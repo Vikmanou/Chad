@@ -12,6 +12,7 @@
 #include "chad/lang/program.h"
 #include "chad/net/expr.h"
 #include "chad/net/net.h"
+#include "chad/net/observer.h"
 #include "chad/runtime/input.h"
 #include "chad/runtime/io.h"
 #include "chad/runtime/utf8.h"
@@ -30,7 +31,9 @@ struct Inside {
 
 class Engine {
 public:
-    Engine(const Program& program, Io& io) : program(program), io(io) {}
+    Engine(const Program& program, Io& io, NetObserver* observer) : program(program), io(io) {
+        net.observer = observer;
+    }
 
     std::uint64_t interactions = 0;
 
@@ -95,6 +98,10 @@ private:
         }
 
         return text + "`";
+    }
+
+    void notify(std::size_t a, std::size_t b, int line) {
+        if (net.observer) net.observer->interaction(a, b, line);
     }
 
     bool hearing(std::size_t a, std::size_t b) const {
@@ -171,13 +178,13 @@ private:
         made.clear();
 
         for (const NewChad& chad : result.chads) {
-            const std::size_t node = net.add(chad.breed, program.breeds[chad.breed].armCount, chad.line);
-            made.push_back(node);
+            std::vector<std::int64_t> values;
             for (const Code& code : chad.values) {
-                net[node].values.push_back(evaluate(code, bound));
+                values.push_back(evaluate(code, bound));
             }
 
-            if (chad.breed == breed::Rep) net[node].label = nextLabel++;
+            const std::uint64_t label = chad.breed == breed::Rep ? nextLabel++ : 0;
+            made.push_back(net.add(chad.breed, program.breeds[chad.breed].armCount, chad.line, values, label));
         }
 
         for (const auto& [x, y] : result.links) {
@@ -233,6 +240,8 @@ private:
         }
         if (chosen == nullptr) throw errorAt(rule.line, "no case fits " + describe(a) + " vs " + describe(b));
 
+        notify(a, b, chosen->line);
+
         build(chosen->result);
         rewire();
         net.remove(a);
@@ -240,6 +249,8 @@ private:
     }
 
     void annihilate(std::size_t a, std::size_t b) {
+        notify(a, b, net[a].line);
+
         collectOutside({a, b});
 
         const std::size_t arms = net[a].ports.size() - 1;
@@ -254,6 +265,8 @@ private:
     }
 
     void commute(std::size_t rep, std::size_t other) {
+        notify(rep, other, net[rep].line);
+
         collectOutside({rep, other});
 
         const Breed kind = net[other].breed;
@@ -266,15 +279,12 @@ private:
 
         std::size_t copies[2];
         for (std::size_t k = 0; k < 2; k++) {
-            copies[k] = net.add(kind, arms, otherLine);
-            net[copies[k]].values = values;
-            net[copies[k]].label = otherLabel;
+            copies[k] = net.add(kind, arms, otherLine, values, otherLabel);
             insides[k].port = Port{copies[k], 0};
         }
 
         for (std::size_t i = 0; i < arms; i++) {
-            const std::size_t split = net.add(breed::Rep, 2, repLine);
-            net[split].label = repLabel;
+            const std::size_t split = net.add(breed::Rep, 2, repLine, {}, repLabel);
             insides[2 + i].port = Port{split, 0};
 
             net.link(Port{split, 1}, Port{copies[0], i + 1});
@@ -287,9 +297,10 @@ private:
     }
 
     void erase(std::size_t ghost, std::size_t victim) {
+        const int line = net[ghost].line;
+        notify(ghost, victim, line);
         collectOutside({victim});
 
-        const int line = net[ghost].line;
         for (Inside& inside : insides) {
             inside.port = Port{net.add(breed::Ghost, 0, line), 0};
         }
@@ -300,6 +311,8 @@ private:
     }
 
     void meetWorld(std::size_t chad, std::size_t world) {
+        notify(chad, world, net[chad].line);
+
         if (net[chad].breed == breed::Say) return say(chad, world);
         if (net[chad].breed == breed::Hear) return hear(chad, world);
         if (net[chad].breed == breed::Rep) throw errorAt(net[chad].line, "can't copy the World", "a `Rep` met the World");
@@ -321,8 +334,8 @@ private:
     void hear(std::size_t chad, std::size_t world) {
         const std::optional<std::int64_t> c = readCodePoint(io);
 
-        const std::size_t got = net.add(c ? breed::Number : breed::Silence, 0, net[chad].line);
-        if (c) net[got].values.push_back(*c);
+        const int line = net[chad].line;
+        const std::size_t got = c ? net.add(breed::Number, 0, line, {*c}) : net.add(breed::Silence, 0, line);
 
         collectOutside({chad});
         insides[0].port = Port{world, 0};
@@ -333,7 +346,7 @@ private:
     }
 };
 
-Machine::Machine(const Program& program, Io& io) : engine(std::make_unique<Engine>(program, io)) {}
+Machine::Machine(const Program& program, Io& io, NetObserver* observer) : engine(std::make_unique<Engine>(program, io, observer)) {}
 
 Machine::~Machine() = default;
 

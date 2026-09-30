@@ -22,9 +22,13 @@ struct Node {
     std::vector<Port> ports;
 };
 
+struct NetObserver;
+
 class Net {
 public:
-    std::size_t add(Breed breed, std::size_t armCount, int line);
+    NetObserver* observer = nullptr;
+
+    std::size_t add(Breed breed, std::size_t armCount, int line, std::vector<std::int64_t> values = {}, std::uint64_t label = 0);
 
     void remove(std::size_t node);
 

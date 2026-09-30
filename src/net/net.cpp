@@ -1,8 +1,12 @@
 #include "chad/net/net.h"
 
+#include <utility>
+
+#include "chad/net/observer.h"
+
 namespace chad {
 
-std::size_t Net::add(Breed breed, std::size_t armCount, int line) {
+std::size_t Net::add(Breed breed, std::size_t armCount, int line, std::vector<std::int64_t> values, std::uint64_t label) {
     std::size_t id = nodes.size();
     if (freeNodes.empty()) {
         nodes.emplace_back();
@@ -14,9 +18,11 @@ std::size_t Net::add(Breed breed, std::size_t armCount, int line) {
     Node& node = nodes[id];
     node.breed = breed;
     node.line = line;
-    node.label = 0;
-    node.values.clear();
+    node.label = label;
+    node.values = std::move(values);
     node.ports.assign(armCount + 1, Port{});
+
+    if (observer) observer->added(id, node);
 
     return id;
 }
@@ -24,11 +30,15 @@ std::size_t Net::add(Breed breed, std::size_t armCount, int line) {
 void Net::remove(std::size_t node) {
     nodes[node].ports.clear();
     freeNodes.push_back(node);
+
+    if (observer) observer->removed(node);
 }
 
 void Net::link(Port a, Port b) {
     nodes[a.node].ports[a.slot] = b;
     nodes[b.node].ports[b.slot] = a;
+
+    if (observer) observer->linked(a, b);
 
     if (a.slot == 0 && b.slot == 0) faceOffs.emplace_back(a.node, b.node);
 }

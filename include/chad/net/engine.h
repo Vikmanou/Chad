@@ -9,12 +9,13 @@ namespace chad {
 
 class Io;
 class Engine;
+struct NetObserver;
 
 enum class Status { Running, Done, NeedInput };
 
 class Machine {
 public:
-    Machine(const Program& program, Io& io);
+    Machine(const Program& program, Io& io, NetObserver* observer = nullptr);
     ~Machine();
 
     void start();
