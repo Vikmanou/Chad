@@ -40,7 +40,7 @@ public:
 
     bool peekFaceOff(std::pair<std::size_t, std::size_t>& faceOff);
 
-    bool nextFaceOff(std::pair<std::size_t, std::size_t>& faceOff);
+    void popFaceOff();
 
 private:
     std::vector<Node> nodes;

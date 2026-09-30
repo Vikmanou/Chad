@@ -52,11 +52,8 @@ bool Net::peekFaceOff(std::pair<std::size_t, std::size_t>& faceOff) {
     return false;
 }
 
-bool Net::nextFaceOff(std::pair<std::size_t, std::size_t>& faceOff) {
-    if (!peekFaceOff(faceOff)) return false;
-
+void Net::popFaceOff() {
     faceOffs.pop_back();
-    return true;
 }
 
 }

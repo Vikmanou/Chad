@@ -60,7 +60,7 @@ public:
             return Status::NeedInput;
         }
 
-        net.nextFaceOff(faceOff);
+        net.popFaceOff();
         react(faceOff.first, faceOff.second);
         interactions++;
 
