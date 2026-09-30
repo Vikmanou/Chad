@@ -25,6 +25,8 @@ struct Inside {
     Port port;
 };
 
+}
+
 class Engine {
 public:
     Engine(const Program& program, Io& io) : program(program), io(io) {}
@@ -318,8 +320,6 @@ private:
         net.remove(chad);
     }
 };
-
-}
 
 std::uint64_t run(const Program& program, Io& io) {
     return Engine(program, io).run();
