@@ -41,15 +41,22 @@ bool Net::facing(std::size_t a, std::size_t b) const {
     return faceA.node == b && faceA.slot == 0 && faceB.node == a && faceB.slot == 0;
 }
 
-bool Net::nextFaceOff(std::pair<std::size_t, std::size_t>& faceOff) {
+bool Net::peekFaceOff(std::pair<std::size_t, std::size_t>& faceOff) {
     while (!faceOffs.empty()) {
         faceOff = faceOffs.back();
-        faceOffs.pop_back();
-
         if (facing(faceOff.first, faceOff.second)) return true;
+
+        faceOffs.pop_back();
     }
 
     return false;
+}
+
+bool Net::nextFaceOff(std::pair<std::size_t, std::size_t>& faceOff) {
+    if (!peekFaceOff(faceOff)) return false;
+
+    faceOffs.pop_back();
+    return true;
 }
 
 }

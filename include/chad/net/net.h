@@ -38,6 +38,8 @@ public:
 
     void link(Port a, Port b);
 
+    bool peekFaceOff(std::pair<std::size_t, std::size_t>& faceOff);
+
     bool nextFaceOff(std::pair<std::size_t, std::size_t>& faceOff);
 
 private:

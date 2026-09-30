@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <optional>
 #include <string>
 #include <utility>
@@ -31,20 +32,39 @@ class Engine {
 public:
     Engine(const Program& program, Io& io) : program(program), io(io) {}
 
-    std::uint64_t run() {
-        start();
+    std::uint64_t interactions = 0;
 
-        std::uint64_t interactions = 0;
+    void start() {
+        collectOutside({});
+        bound.clear();
 
+        if (program.usesWorld) {
+            const std::size_t world = net.add(breed::World, 0, program.mainLine);
+            outsidePorts.push_back(Port{world, 0});
+        }
+        insides.assign(outsidePorts.size(), Inside{});
+
+        build(program.main);
+        rewire();
+    }
+
+    Status step() {
         std::pair<std::size_t, std::size_t> faceOff;
-        while (net.nextFaceOff(faceOff)) {
-            react(faceOff.first, faceOff.second);
-            interactions++;
+        if (!net.peekFaceOff(faceOff)) {
+            io.flushOutput();
+            return Status::Done;
         }
 
-        io.flushOutput();
+        if (hearing(faceOff.first, faceOff.second) && !io.inputReady()) {
+            io.flushOutput();
+            return Status::NeedInput;
+        }
 
-        return interactions;
+        net.nextFaceOff(faceOff);
+        react(faceOff.first, faceOff.second);
+        interactions++;
+
+        return Status::Running;
     }
 
 private:
@@ -77,18 +97,10 @@ private:
         return text + "`";
     }
 
-    void start() {
-        collectOutside({});
-        bound.clear();
-
-        if (program.usesWorld) {
-            const std::size_t world = net.add(breed::World, 0, program.mainLine);
-            outsidePorts.push_back(Port{world, 0});
-        }
-        insides.assign(outsidePorts.size(), Inside{});
-
-        build(program.main);
-        rewire();
+    bool hearing(std::size_t a, std::size_t b) const {
+        const Breed first = net[a].breed;
+        const Breed second = net[b].breed;
+        return (first == breed::Hear && second == breed::World) || (first == breed::World && second == breed::Hear);
     }
 
     void collectOutside(const std::vector<std::size_t>& nodes) {
@@ -321,8 +333,37 @@ private:
     }
 };
 
+Machine::Machine(const Program& program, Io& io) : engine(std::make_unique<Engine>(program, io)) {}
+
+Machine::~Machine() = default;
+
+void Machine::start() {
+    engine->start();
+}
+
+Status Machine::step() {
+    return engine->step();
+}
+
+Status Machine::runFor(std::uint64_t maxSteps) {
+    Status status = Status::Running;
+    for (std::uint64_t i = 0; i < maxSteps && status == Status::Running; i++) {
+        status = engine->step();
+    }
+
+    return status;
+}
+
+std::uint64_t Machine::interactions() const {
+    return engine->interactions;
+}
+
 std::uint64_t run(const Program& program, Io& io) {
-    return Engine(program, io).run();
+    Machine machine(program, io);
+    machine.start();
+    machine.runFor(UINT64_MAX);
+
+    return machine.interactions();
 }
 
 }
